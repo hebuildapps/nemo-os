@@ -1,0 +1,4 @@
+project_id = "hguvjnmgjxkwundknydp"
+
+[functions.generate-mcq]
+verify_jwt = false

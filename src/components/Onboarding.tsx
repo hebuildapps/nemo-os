@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { fmt } from '@/lib/nemo-data';
 
 interface OnboardingProps {
-  onComplete: (name: string, date: string, role: string, hours: number, ref: string) => void;
+  onComplete: (name: string, date: string, role: string, hours: number, ref: string) => Promise<void>;
 }
 
 const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
@@ -15,20 +15,27 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [hours, setHours] = useState('4');
   const [ref, setRef] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
     if (!date) { setError('Please set your placement date!'); return; }
     if (!role) { setError('Please select a target role!'); return; }
     if (new Date(date) <= new Date()) { setError('Placement date must be in the future!'); return; }
-    onComplete(name.trim() || 'NEMO', date, role, parseInt(hours), ref.trim().toUpperCase());
+    setLoading(true);
+    try {
+      await onComplete(name.trim() || 'NEMO', date, role, parseInt(hours), ref.trim().toUpperCase());
+    } catch (e: any) {
+      setError(e.message || 'Something went wrong');
+    }
+    setLoading(false);
   };
 
   return (
-    <div className="fixed inset-0 bg-background flex items-center justify-center z-[100]">
+    <div className="flex-1 flex items-center justify-center bg-background">
       <div className="bg-surface border-2 border-border p-[36px] w-[470px] max-w-[95vw]">
-        <div className="font-pixel text-[12px] mb-[6px] leading-[1.6]">NEMO OS</div>
+        <div className="font-pixel text-[12px] mb-[6px] leading-[1.6]">NEMO OS — SETUP</div>
         <div className="text-[12px] text-muted-foreground mb-[24px] leading-[1.5]">
-          Gamified placement prep OS. Set up your mission parameters.
+          Configure your placement prep mission parameters.
         </div>
 
         {error && (
@@ -79,9 +86,10 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
         <button
           onClick={submit}
-          className="font-pixel text-[9px] p-[13px] w-full bg-primary text-primary-foreground border-none cursor-pointer mt-[6px] transition-opacity hover:opacity-85"
+          disabled={loading}
+          className="font-pixel text-[9px] p-[13px] w-full bg-primary text-primary-foreground border-none cursor-pointer mt-[6px] transition-opacity hover:opacity-85 disabled:opacity-50"
         >
-          INITIALIZE NEMO OS →
+          {loading ? 'GENERATING PLAN...' : 'INITIALIZE NEMO OS →'}
         </button>
       </div>
     </div>
