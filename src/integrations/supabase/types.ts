@@ -14,7 +14,226 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      badges: {
+        Row: {
+          description: string
+          icon: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          description: string
+          icon: string
+          id: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          coins: number
+          created_at: string
+          current_stage: string
+          equipped_item: string | null
+          hours_per_day: number
+          id: string
+          last_active: string | null
+          name: string
+          onboarding_complete: boolean
+          placement_date: string
+          referral_code: string
+          referred_by: string | null
+          streak: number
+          target_role: string
+          total_earned: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          coins?: number
+          created_at?: string
+          current_stage?: string
+          equipped_item?: string | null
+          hours_per_day?: number
+          id?: string
+          last_active?: string | null
+          name?: string
+          onboarding_complete?: boolean
+          placement_date?: string
+          referral_code?: string
+          referred_by?: string | null
+          streak?: number
+          target_role?: string
+          total_earned?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          coins?: number
+          created_at?: string
+          current_stage?: string
+          equipped_item?: string | null
+          hours_per_day?: number
+          id?: string
+          last_active?: string | null
+          name?: string
+          onboarding_complete?: boolean
+          placement_date?: string
+          referral_code?: string
+          referred_by?: string | null
+          streak?: number
+          target_role?: string
+          total_earned?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      shop_items: {
+        Row: {
+          description: string
+          icon: string
+          id: string
+          item_type: string
+          name: string
+          price: number
+          sort_order: number
+        }
+        Insert: {
+          description: string
+          icon: string
+          id: string
+          item_type: string
+          name: string
+          price: number
+          sort_order?: number
+        }
+        Update: {
+          description?: string
+          icon?: string
+          id?: string
+          item_type?: string
+          name?: string
+          price?: number
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          coins_reward: number
+          completed: boolean
+          created_at: string
+          date: string
+          description: string
+          difficulty: string
+          id: string
+          is_break: boolean
+          mcq_verified: boolean
+          stage: string
+          stage_key: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          coins_reward?: number
+          completed?: boolean
+          created_at?: string
+          date: string
+          description?: string
+          difficulty?: string
+          id?: string
+          is_break?: boolean
+          mcq_verified?: boolean
+          stage: string
+          stage_key: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          coins_reward?: number
+          completed?: boolean
+          created_at?: string
+          date?: string
+          description?: string
+          difficulty?: string
+          id?: string
+          is_break?: boolean
+          mcq_verified?: boolean
+          stage?: string
+          stage_key?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_items: {
+        Row: {
+          id: string
+          item_id: string
+          purchased_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          item_id: string
+          purchased_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          item_id?: string
+          purchased_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "shop_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
