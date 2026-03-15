@@ -6,35 +6,35 @@
 
 @layer base {
   :root {
-    --background: 40 20% 95%;
-    --foreground: 40 10% 10%;
+    --background: 0 0% 98%;
+    --foreground: 220 10% 12%;
     --surface: 0 0% 100%;
-    --surface2: 40 18% 92%;
+    --surface2: 0 0% 95%;
 
     --card: 0 0% 100%;
-    --card-foreground: 40 10% 10%;
+    --card-foreground: 220 10% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 40 10% 10%;
+    --popover-foreground: 220 10% 12%;
 
-    --primary: 40 10% 16%;
-    --primary-foreground: 40 20% 95%;
+    --primary: 220 8% 16%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 40 18% 92%;
-    --secondary-foreground: 40 10% 16%;
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 220 8% 16%;
 
-    --muted: 40 12% 90%;
-    --muted-foreground: 40 8% 45%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 220 5% 46%;
 
-    --accent: 40 10% 16%;
-    --accent-foreground: 40 20% 95%;
+    --accent: 220 8% 16%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 50% 35%;
+    --destructive: 0 52% 40%;
     --destructive-foreground: 0 0% 95%;
 
-    --border: 40 12% 80%;
-    --input: 40 12% 80%;
-    --ring: 40 10% 16%;
+    --border: 0 0% 82%;
+    --input: 0 0% 82%;
+    --ring: 220 8% 16%;
 
     --radius: 0px;
 
@@ -47,13 +47,13 @@
     --font-mono: 'IBM Plex Mono', monospace;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 40 10% 10%;
-    --sidebar-primary: 40 10% 16%;
-    --sidebar-primary-foreground: 40 20% 95%;
-    --sidebar-accent: 40 18% 92%;
-    --sidebar-accent-foreground: 40 10% 16%;
-    --sidebar-border: 40 12% 80%;
-    --sidebar-ring: 40 10% 16%;
+    --sidebar-foreground: 220 10% 12%;
+    --sidebar-primary: 220 8% 16%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 95%;
+    --sidebar-accent-foreground: 220 8% 16%;
+    --sidebar-border: 0 0% 82%;
+    --sidebar-ring: 220 8% 16%;
   }
 }
 
@@ -80,4 +80,17 @@
 /* Tabular nums for counters */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+@layer utilities {
+  .shadow,
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl,
+  .shadow-2xl {
+    --tw-shadow: 0 0 #0000 !important;
+    --tw-shadow-colored: 0 0 #0000 !important;
+    box-shadow: none !important;
+  }
 }

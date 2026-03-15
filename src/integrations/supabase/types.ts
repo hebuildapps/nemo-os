@@ -44,6 +44,7 @@ export type Database = {
           created_at: string
           current_stage: string
           equipped_item: string | null
+          gender: string
           hours_per_day: number
           id: string
           last_active: string | null
@@ -63,6 +64,7 @@ export type Database = {
           created_at?: string
           current_stage?: string
           equipped_item?: string | null
+          gender?: string
           hours_per_day?: number
           id?: string
           last_active?: string | null
@@ -82,6 +84,7 @@ export type Database = {
           created_at?: string
           current_stage?: string
           equipped_item?: string | null
+          gender?: string
           hours_per_day?: number
           id?: string
           last_active?: string | null

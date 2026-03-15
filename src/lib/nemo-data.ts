@@ -116,9 +116,9 @@ export const BADGE_DEFS: BadgeDef[] = [
   { id: 'tasks50', ico: '🎓', name: 'SCHOLAR', desc: 'Complete 50 tasks', chk: (t) => completedCount(t) >= 50 },
   { id: 'stage_foundations', ico: '🏗️', name: 'FOUNDATIONS LAID', desc: 'Finish Foundations stage', chk: (t) => stageAllDone(t, 'Foundations') },
   { id: 'stage_coredsa', ico: '🧮', name: 'DSA WARRIOR', desc: 'Finish Core DSA stage', chk: (t) => stageAllDone(t, 'Core DSA') },
-  { id: 'coins100', ico: '💰', name: 'MONEYED', desc: 'Hold 100 coins', chk: (_, u) => u.coins >= 100 },
+  { id: 'coins100', ico: '💰', name: 'MONEYED', desc: 'Hold 100 gems', chk: (_, u) => u.coins >= 100 },
   { id: 'shopper', ico: '🛒', name: 'SHOPPER', desc: 'Purchase first shop item', chk: (_, __, items) => items.size >= 1 },
-  { id: 'coins_earned_200', ico: '🏦', name: 'EARNER', desc: 'Earn 200 coins total', chk: (_, u) => (u.totalEarned || 0) >= 200 },
+  { id: 'coins_earned_200', ico: '🏦', name: 'EARNER', desc: 'Earn 200 gems total', chk: (_, u) => (u.totalEarned || 0) >= 200 },
 ];
 
 export const SHOP_ITEMS: ShopItem[] = [
@@ -126,7 +126,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   { id: 'glasses', name: 'COOL GLASSES', price: 25, ico: '🕶️', type: 'glasses', desc: 'Stay stylish while grinding' },
   { id: 'theme_dark', name: 'DARK MODE', price: 50, ico: '🌑', type: 'theme', desc: 'Night owl edition' },
   { id: 'theme_warm', name: 'WARM THEME', price: 40, ico: '🌅', type: 'theme', desc: 'Cozy amber tones' },
-  { id: 'coin_boost', name: 'COIN BOOST', price: 80, ico: '⚡', type: 'boost', desc: '+2 bonus coins per task (7 days)' },
+  { id: 'coin_boost', name: 'GEM BOOST', price: 80, ico: '⚡', type: 'boost', desc: '+2 bonus gems per task (7 days)' },
   { id: 'theme_matrix', name: 'MATRIX THEME', price: 65, ico: '💚', type: 'theme', desc: 'Enter the matrix' },
 ];
 

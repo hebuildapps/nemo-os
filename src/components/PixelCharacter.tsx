@@ -6,7 +6,7 @@ interface PixelCharacterProps {
 }
 
 const PixelCharacter: React.FC<PixelCharacterProps> = ({ showHat = false, showGlasses = false }) => (
-  <svg viewBox="0 0 120 140" className="w-[110px] h-[130px]" style={{ imageRendering: 'pixelated' }}>
+  <svg viewBox="0 0 120 140" className="w-[110px] h-[126px]" style={{ imageRendering: 'pixelated' }}>
     {showHat && (
       <g>
         <rect x="28" y="0" width="64" height="10" fill="hsl(var(--coin))" />

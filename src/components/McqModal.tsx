@@ -105,7 +105,7 @@ const McqModal: React.FC<McqModalProps> = ({ task, onCorrect, onClose }) => {
         </div>
         {done && (
           <div className={`p-[11px_14px] mt-[10px] font-pixel text-[8px] leading-[1.6] border-[1.5px] ${isCorrect ? 'bg-nemo-green/10 text-nemo-green border-nemo-green' : 'bg-nemo-red/10 text-nemo-red border-nemo-red'}`}>
-            {isCorrect ? `✓ CORRECT! +${task.coins_reward} coins awarded. Task complete.` : `✗ INCORRECT. Correct: Option ${String.fromCharCode(65 + mcq.correct)}. Review and try again.`}
+            {isCorrect ? `✓ CORRECT! +${task.coins_reward} gems awarded. Task complete.` : `✗ INCORRECT. Correct: Option ${String.fromCharCode(65 + mcq.correct)}. Review and try again.`}
           </div>
         )}
       </div>

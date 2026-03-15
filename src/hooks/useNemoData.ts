@@ -24,7 +24,7 @@ export interface NemoData {
   completeTask: (taskId: string, mcqVerified: boolean) => Promise<void>;
   purchaseItem: (itemId: string, price: number) => Promise<void>;
   equipItem: (itemId: string | null) => Promise<void>;
-  generatePlan: (placementDate: string, targetRole: string, hoursPerDay: number, name: string, referredBy?: string) => Promise<void>;
+  generatePlan: (placementDate: string, targetRole: string, hoursPerDay: number, name: string, gender: 'boy' | 'girl', referredBy?: string) => Promise<void>;
   resetPlan: () => Promise<void>;
 }
 
@@ -159,7 +159,7 @@ export function useNemoData(): NemoData {
     await updateProfile({ equipped_item: itemId });
   }, [updateProfile]);
 
-  const generatePlan = useCallback(async (placementDate: string, targetRole: string, hoursPerDay: number, name: string, referredBy?: string) => {
+  const generatePlan = useCallback(async (placementDate: string, targetRole: string, hoursPerDay: number, name: string, gender: 'boy' | 'girl', referredBy?: string) => {
     if (!user) return;
 
     const startCoins = referredBy ? 50 : 0;
@@ -170,6 +170,7 @@ export function useNemoData(): NemoData {
       placement_date: placementDate,
       target_role: targetRole,
       hours_per_day: hoursPerDay,
+      gender,
       coins: startCoins,
       total_earned: startCoins,
       referred_by: referredBy || null,

@@ -14,6 +14,14 @@ import AuthPage from '@/components/AuthPage';
 import McqModal from '@/components/McqModal';
 import { toast } from 'sonner';
 
+const FramedViewport: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="h-dvh w-full bg-background px-[10vw] py-[10vh] max-md:p-0">
+    <div className="mx-auto flex h-full w-full overflow-hidden bg-background">
+      {children}
+    </div>
+  </div>
+);
+
 const Index: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
   const nemo = useNemoData();
@@ -27,7 +35,7 @@ const Index: React.FC = () => {
 
     if (task.is_break) {
       nemo.completeTask(id, false).then(() => {
-        toast(`☕ Break day logged! +${task.coins_reward} coin`);
+        toast(`☕ Break day logged! +${task.coins_reward} gems`);
       });
       return;
     }
@@ -39,14 +47,14 @@ const Index: React.FC = () => {
     const task = nemo.tasks.find(t => t.id === mcqTaskId);
     setMcqTaskId(null);
     nemo.completeTask(mcqTaskId, true).then(() => {
-      toast(`✓ +${task?.coins_reward ?? 5} coins! Task complete.`);
+      toast(`✓ +${task?.coins_reward ?? 5} gems! Task complete.`);
     });
   }, [mcqTaskId, nemo]);
 
   const handleShopBuy = useCallback((id: string, price: number) => {
     if (!nemo.profile) return;
     if (nemo.profile.coins < price) {
-      toast(`Not enough coins! Need ${price}, have ${nemo.profile.coins}`);
+      toast(`Not enough gems! Need ${price}, have ${nemo.profile.coins}`);
       return;
     }
     nemo.purchaseItem(id, price).then(() => toast('✓ Purchased!'));
@@ -56,9 +64,21 @@ const Index: React.FC = () => {
     nemo.equipItem(id);
   }, [nemo]);
 
-  const handleOnboard = useCallback(async (name: string, date: string, role: string, hours: number, ref: string) => {
-    await nemo.generatePlan(date, role, hours, name, ref || undefined);
-    if (ref) toast('🪙 +50 COINS! Referral code applied.');
+  const handleOnboard = useCallback(async (gender: 'boy' | 'girl', name: string, date: string, role: string, hours: number, ref: string) => {
+    await nemo.generatePlan(date, role, hours, name, gender, ref || undefined);
+    if (ref) {
+      toast(
+        <span className="inline-flex items-center gap-1">
+          <img
+            src="/public/diamond.png"
+            alt="gem"
+            className="w-[40px] h-[40px] shrink-0"
+            style={{ imageRendering: 'pixelated' }}
+          />
+          +50 GEMS! Referral code applied.
+        </span>
+      );
+    }
   }, [nemo]);
 
   const confirmReset = useCallback(async () => {
@@ -71,85 +91,111 @@ const Index: React.FC = () => {
   // Loading state
   if (authLoading || (user && nemo.loading)) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="font-pixel text-[10px] text-muted-foreground">LOADING NEMO OS...</div>
-      </div>
+      <FramedViewport>
+        <div className="flex h-full w-full items-center justify-center bg-background">
+          <div className="font-pixel text-[10px] text-muted-foreground">LOADING NEMO OS...</div>
+        </div>
+      </FramedViewport>
     );
   }
 
   // Not logged in
-  if (!user) return <AuthPage />;
+  if (!user) {
+    return (
+      <FramedViewport>
+        <AuthPage />
+      </FramedViewport>
+    );
+  }
 
   // Onboarding needed
   if (nemo.profile && !nemo.profile.onboarding_complete) {
     return (
-      <div className="flex h-screen w-full">
-        <Onboarding onComplete={handleOnboard} />
-      </div>
+      <FramedViewport>
+        <div className="flex h-full w-full">
+          <Onboarding onComplete={handleOnboard} />
+        </div>
+      </FramedViewport>
     );
   }
 
   // Profile not ready yet
   if (!nemo.profile) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="font-pixel text-[10px] text-muted-foreground">INITIALIZING...</div>
-      </div>
+      <FramedViewport>
+        <div className="flex h-full w-full items-center justify-center bg-background">
+          <div className="font-pixel text-[10px] text-muted-foreground">INITIALIZING...</div>
+        </div>
+      </FramedViewport>
     );
   }
 
   const mcqTask = mcqTaskId ? nemo.tasks.find(t => t.id === mcqTaskId) : null;
 
   return (
-    <div className="flex h-screen w-full">
-      {/* Left: Character Panel */}
-      <div className="max-md:hidden">
-        <CharacterPanel profile={nemo.profile} tasks={nemo.tasks} />
-      </div>
+    <FramedViewport>
+      <div className="flex h-full w-full bg-background overflow-hidden">
+        {/* Left: Character Panel */}
+        <div className="h-full max-md:hidden">
+          <CharacterPanel profile={nemo.profile} tasks={nemo.tasks} />
+        </div>
 
-      {/* Center: Workspace */}
-      <main className="flex-1 bg-background overflow-y-auto p-[22px] max-md:pb-[66px]">
-        {workspace === 'calendar' && <CalendarWorkspace tasks={nemo.tasks} onComplete={handleComplete} />}
-        {workspace === 'tasks' && <TasksWorkspace tasks={nemo.tasks} onComplete={handleComplete} />}
-        {workspace === 'badges' && <BadgesWorkspace badges={nemo.badges} userBadges={nemo.userBadges} />}
-        {workspace === 'shop' && (
-          <ShopWorkspace
-            profile={nemo.profile}
-            shopItems={nemo.shopItems}
-            userItems={nemo.userItems}
-            onBuy={handleShopBuy}
-            onEquip={handleEquip}
-          />
-        )}
-        {workspace === 'profile' && (
-          <ProfileWorkspace profile={nemo.profile} tasks={nemo.tasks} onReset={() => setShowConfirm(true)} />
-        )}
-      </main>
-
-      {/* Right: Icon Rail */}
-      <IconRail active={workspace} onSwitch={setWorkspace} />
-
-      {/* MCQ Modal */}
-      {mcqTask && (
-        <McqModal task={mcqTask} onCorrect={onMcqCorrect} onClose={() => setMcqTaskId(null)} />
-      )}
-
-      {/* Confirm Reset */}
-      {showConfirm && (
-        <div className="fixed inset-0 bg-foreground/70 flex items-center justify-center z-[200]">
-          <div className="bg-surface border-2 border-nemo-red p-[28px] w-[400px] max-w-[95vw]">
-            <div className="font-pixel text-[9px] text-nemo-red mb-[10px]">⚠ DESTRUCTIVE ACTION</div>
-            <div className="text-[12px] text-muted-foreground leading-[1.6] mb-[18px]">
-              This permanently deletes your current plan, task progress, coins, streak, and all earned data. There is no undo.
+        {/* Center: Workspace */}
+        <main className="flex-1 h-full min-w-0 bg-background overflow-y-auto px-[24px] py-[18px] max-md:pb-[72px]">
+          {workspace === 'calendar' && (
+            <div className="h-full">
+              <CalendarWorkspace tasks={nemo.tasks} onComplete={handleComplete} />
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setShowConfirm(false)} className="font-pixel text-[7px] p-[9px_14px] bg-transparent text-muted-foreground border-[1.5px] border-border cursor-pointer flex-1">CANCEL</button>
-              <button onClick={confirmReset} className="font-pixel text-[7px] p-[9px_14px] bg-nemo-red text-primary-foreground border-none cursor-pointer flex-1">RESET EVERYTHING</button>
+          )}
+          {workspace === 'tasks' && <TasksWorkspace tasks={nemo.tasks} onComplete={handleComplete} />}
+          {workspace === 'badges' && (
+            <BadgesWorkspace
+              badges={nemo.badges}
+              userBadges={nemo.userBadges}
+              profile={nemo.profile}
+              tasks={nemo.tasks}
+              userItems={nemo.userItems}
+            />
+          )}
+          {workspace === 'shop' && (
+            <ShopWorkspace
+              profile={nemo.profile}
+              shopItems={nemo.shopItems}
+              userItems={nemo.userItems}
+              onBuy={handleShopBuy}
+              onEquip={handleEquip}
+            />
+          )}
+          {workspace === 'profile' && (
+            <ProfileWorkspace profile={nemo.profile} tasks={nemo.tasks} onReset={() => setShowConfirm(true)} />
+          )}
+        </main>
+
+        {/* Right: Icon Rail */}
+        <IconRail active={workspace} onSwitch={setWorkspace} />
+
+        {/* MCQ Modal */}
+        {mcqTask && (
+          <McqModal task={mcqTask} onCorrect={onMcqCorrect} onClose={() => setMcqTaskId(null)} />
+        )}
+
+        {/* Confirm Reset */}
+        {showConfirm && (
+          <div className="fixed inset-0 bg-foreground/70 flex items-center justify-center z-[200]">
+            <div className="bg-surface border-2 border-nemo-red p-[28px] w-[400px] max-w-[95vw]">
+              <div className="font-pixel text-[9px] text-nemo-red mb-[10px]">⚠ DESTRUCTIVE ACTION</div>
+              <div className="text-[12px] text-muted-foreground leading-[1.6] mb-[18px]">
+                This permanently deletes your current plan, task progress, gems, streak, and all earned data. There is no undo.
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => setShowConfirm(false)} className="font-pixel text-[7px] p-[9px_14px] bg-transparent text-muted-foreground border-[1.5px] border-border cursor-pointer flex-1">CANCEL</button>
+                <button onClick={confirmReset} className="font-pixel text-[7px] p-[9px_14px] bg-nemo-red text-primary-foreground border-none cursor-pointer flex-1">RESET EVERYTHING</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </FramedViewport>
   );
 };
 

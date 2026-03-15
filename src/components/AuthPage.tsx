@@ -30,7 +30,7 @@ const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-background flex items-center justify-center z-[100]">
+    <div className="h-full w-full bg-background flex items-center justify-center">
       <div className="bg-surface border-2 border-border p-[36px] w-[470px] max-w-[95vw]">
         <div className="font-pixel text-[12px] mb-[6px] leading-[1.6]">NEMO OS</div>
         <div className="text-[12px] text-muted-foreground mb-[24px] leading-[1.5]">

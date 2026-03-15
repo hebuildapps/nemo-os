@@ -32,7 +32,7 @@ const ProfileWorkspace: React.FC<ProfileWorkspaceProps> = ({ profile, tasks, onR
           ['Hours / Day', `${profile.hours_per_day} hrs/day`],
           ['Current Stage', profile.current_stage],
           ['Tasks Completed', String(done)],
-          ['Coins', String(profile.coins)],
+          ['Gems', String(profile.coins)],
           ['Streak', `${profile.streak} days`],
         ] as [string, string][]).map(([k, v]) => (
           <div key={k} className="flex justify-between py-[7px] border-b border-surface2 text-[12px]">
@@ -44,7 +44,7 @@ const ProfileWorkspace: React.FC<ProfileWorkspaceProps> = ({ profile, tasks, onR
 
       <div className="bg-surface border-[1.5px] border-border p-[18px] mb-[14px]">
         <div className="font-pixel text-[7px] text-muted-foreground mb-[14px] pb-[7px] border-b border-border">REFERRAL</div>
-        <div className="text-[11px] text-muted-foreground mb-[9px]">Share your code. Each referral = +50 coins.</div>
+        <div className="text-[11px] text-muted-foreground mb-[9px]">Share your code. Each referral = +50 gems.</div>
         <div
           onClick={copyRef}
           className="font-pixel text-[10px] bg-surface2 border-[1.5px] border-border p-[10px_14px] tracking-[2px] text-center text-primary cursor-pointer hover:border-primary transition-colors"
