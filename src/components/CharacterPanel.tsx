@@ -51,8 +51,8 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
 
       <div className="w-full px-[6px] flex items-center justify-center">
         <div className="relative w-full h-[9px] bg-surface2 border border-border/70">
-          <span className="absolute -left-[12px] font-pixel text-[9px] -top-[2px] text-foreground">[</span>
-          <span className="absolute -right-[12px] font-pixel text-[9px] -top-[2px] text-foreground">]</span>
+          <span className="absolute -left-[12px] font-pixel text-[9px] -top-[2px] text-foreground"></span>
+          <span className="absolute -right-[12px] font-pixel text-[9px] -top-[2px] text-foreground"></span>
           <div className="h-full bg-primary transition-all duration-500" style={{ width: `${progressPct}%` }} />
         </div>
       </div>

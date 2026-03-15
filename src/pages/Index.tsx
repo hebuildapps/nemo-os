@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 
 const FramedViewport: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="h-dvh w-full bg-background px-[10vw] py-[10vh] max-md:p-0">
-    <div className="mx-auto flex h-full w-full overflow-hidden bg-background">
+    <div className="mx-auto flex h-full w-full overflow-hidden bg-background rounded-xl border border-[#e3e1dd] bg-[#f6f6f5]">
       {children}
     </div>
   </div>
@@ -72,7 +72,7 @@ const Index: React.FC = () => {
           <img
             src="/public/diamond.png"
             alt="gem"
-            className="w-[40px] h-[40px] shrink-0"
+            className="w-[16px] h-[16px] shrink-0"
             style={{ imageRendering: 'pixelated' }}
           />
           +50 GEMS! Referral code applied.
@@ -141,7 +141,7 @@ const Index: React.FC = () => {
         </div>
 
         {/* Center: Workspace */}
-        <main className="flex-1 h-full min-w-0 bg-background overflow-y-auto px-[24px] py-[18px] max-md:pb-[72px]">
+        <main className="flex-1 h-full min-w-0  bg-[#cec8b8] overflow-y-auto px-[24px] py-[18px] max-md:pb-[72px]">
           {workspace === 'calendar' && (
             <div className="h-full">
               <CalendarWorkspace tasks={nemo.tasks} onComplete={handleComplete} />
