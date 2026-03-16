@@ -1,5 +1,6 @@
 import json
 import os
+import traceback
 from pathlib import Path
 from typing import List
 
@@ -20,16 +21,17 @@ def load_local_env() -> None:
             continue
 
         key, value = line.split("=", 1)
-        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+        os.environ[key.strip()] = value.strip().strip('"').strip("'")
 
 
 load_local_env()
 
 bedrock = boto3.client(
     service_name="bedrock-runtime",
-    region_name="us-south-1",
+    region_name="us-east-1",
     aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY")
+    aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
+    aws_session_token=os.environ.get("AWS_SESSION_TOKEN")
 )
 
 app = FastAPI()
@@ -63,6 +65,31 @@ def require_aws_credentials() -> None:
         raise HTTPException(status_code=500, detail="AWS Bedrock credentials are not configured")
 
 
+def extract_bedrock_text(response_body: dict) -> str:
+    content_blocks = response_body.get("output", {}).get("message", {}).get("content", [])
+    text_parts = [block.get("text", "") for block in content_blocks if isinstance(block, dict)]
+    return "\n".join(part for part in text_parts if part).strip()
+
+
+def extract_json_document(text: str) -> str:
+    candidate = text.strip()
+
+    if candidate.startswith("```"):
+        lines = candidate.splitlines()
+        if lines:
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        candidate = "\n".join(lines).strip()
+
+    start = candidate.find("{")
+    end = candidate.rfind("}")
+    if start != -1 and end != -1 and start < end:
+        return candidate[start:end + 1]
+
+    return candidate
+
+
 def invoke_nova_lite(prompt: str) -> str:
     require_aws_credentials()
 
@@ -70,7 +97,11 @@ def invoke_nova_lite(prompt: str) -> str:
         "messages": [
             {
                 "role": "user",
-                "content": prompt
+                "content": [
+                    {
+                        "text": prompt
+                    }
+                ]
             }
         ],
         "inferenceConfig": {
@@ -80,12 +111,12 @@ def invoke_nova_lite(prompt: str) -> str:
     })
 
     response = bedrock.invoke_model(
-        modelId="global.amazon.nova-2-lite-v1:0",
+        modelId="amazon.nova-lite-v1:0",
         body=body
     )
 
     response_body = json.loads(response["body"].read())
-    return response_body["output"]["message"]["content"][0]["text"]
+    return extract_bedrock_text(response_body)
 
 @app.post("/stage-briefing")
 async def stage_briefing(req: StageRequest):
@@ -114,6 +145,7 @@ async def stage_briefing(req: StageRequest):
     try:
         text = invoke_nova_lite(prompt)
     except Exception as exc:
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Failed to generate stage briefing: {exc}") from exc
 
     return {
@@ -134,12 +166,14 @@ async def generate_mcq(req: McqRequest):
         f"Topic: {req.topic}\nDifficulty: {req.difficulty}\nStage: {req.stage}\n\n"
         f'Return ONLY valid JSON with this exact shape and nothing else:\n'
         f'{{"question":"...","options":["...","...","...","..."],"correct":0}}\n\n'
-        f"correct is the 0-based index of the correct answer. Provide exactly 4 options, only one correct."
+        f"correct is the 0-based index of the correct answer. Provide exactly 4 options, only one correct. "
+        f"Do not wrap the JSON in markdown code fences or add any explanation."
     )
 
+    text = ""
     try:
         text = invoke_nova_lite(prompt)
-        data = json.loads(text)
+        data = json.loads(extract_json_document(text))
         mcq = McqResponse(**data)
 
         if len(mcq.options) != 4:
@@ -148,7 +182,11 @@ async def generate_mcq(req: McqRequest):
             raise ValueError("MCQ correct index is out of range")
 
         return mcq
+    except json.JSONDecodeError as exc:
+        print(f"Unexpected MCQ model output: {text!r}")
+        raise HTTPException(status_code=500, detail="Failed to generate MCQ: Model did not return valid JSON") from exc
     except Exception as exc:
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Failed to generate MCQ: {exc}") from exc
 
 def extract_section(text, section):
