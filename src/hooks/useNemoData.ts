@@ -10,6 +10,12 @@ type BadgeRow = Database['public']['Tables']['badges']['Row'];
 type UserBadgeRow = Database['public']['Tables']['user_badges']['Row'];
 type ShopItemRow = Database['public']['Tables']['shop_items']['Row'];
 type UserItemRow = Database['public']['Tables']['user_items']['Row'];
+type ProfileWithGems = Profile & {
+  gems?: number;
+  total_gems_earned?: number;
+  earned_gems?: number;
+  lifetime_gems?: number;
+};
 
 export interface NemoData {
   profile: Profile | null;
@@ -32,6 +38,22 @@ function fmt(d: Date): string {
   return d.toISOString().split('T')[0];
 }
 
+const readGems = (value: Profile | null): number => {
+  const candidate = value as ProfileWithGems | null;
+  return Number(candidate?.gems ?? candidate?.coins ?? 0);
+};
+
+const readTotalEarned = (value: Profile | null): number => {
+  const candidate = value as ProfileWithGems | null;
+  return Number(
+    candidate?.total_earned
+    ?? candidate?.total_gems_earned
+    ?? candidate?.earned_gems
+    ?? candidate?.lifetime_gems
+    ?? readGems(value),
+  );
+};
+
 export function useNemoData(): NemoData {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -42,6 +64,45 @@ export function useNemoData(): NemoData {
   const [userItems, setUserItems] = useState<UserItemRow[]>([]);
   const [loading, setLoading] = useState(true);
   const hasLoadedRef = useRef(false);
+  const currencyColumnRef = useRef<'coins' | 'gems'>('coins');
+  const totalEarnedColumnRef = useRef<'total_earned' | 'total_gems_earned' | null>('total_earned');
+
+  const syncCurrencyColumn = (value: unknown) => {
+    if (!value || typeof value !== 'object') return;
+    if (Object.prototype.hasOwnProperty.call(value, 'gems')) {
+      currencyColumnRef.current = 'gems';
+      return;
+    }
+    if (Object.prototype.hasOwnProperty.call(value, 'coins')) {
+      currencyColumnRef.current = 'coins';
+    }
+  };
+
+  const syncTotalEarnedColumn = (value: unknown) => {
+    if (!value || typeof value !== 'object') return;
+
+    if (Object.prototype.hasOwnProperty.call(value, 'total_earned')) {
+      totalEarnedColumnRef.current = 'total_earned';
+      return;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(value, 'total_gems_earned')) {
+      totalEarnedColumnRef.current = 'total_gems_earned';
+      return;
+    }
+
+    totalEarnedColumnRef.current = null;
+  };
+
+  const buildTotalEarnedUpdate = (value: number): Record<string, number> => {
+    if (totalEarnedColumnRef.current === 'total_gems_earned') {
+      return { total_gems_earned: value };
+    }
+    if (totalEarnedColumnRef.current === 'total_earned') {
+      return { total_earned: value };
+    }
+    return {};
+  };
 
   const fetchAll = useCallback(async (showLoader = false) => {
     if (!user) {
@@ -69,6 +130,11 @@ export function useNemoData(): NemoData {
       supabase.from('user_items').select('*').eq('user_id', user.id),
     ]);
 
+    if (profileRes.data) {
+      syncCurrencyColumn(profileRes.data);
+      syncTotalEarnedColumn(profileRes.data);
+    }
+
     setProfile(profileRes.data ?? null);
     setTasks(tasksRes.data ?? []);
     setBadges(badgesRes.data ?? []);
@@ -84,15 +150,62 @@ export function useNemoData(): NemoData {
 
   const updateProfile = useCallback(async (updates: Partial<Profile>) => {
     if (!user) return;
-    const { data } = await supabase.from('profiles').update(updates).eq('user_id', user.id).select().single();
-    if (data) setProfile(data);
+
+    const payload = { ...(updates as Record<string, unknown>) };
+
+    if ('total_earned' in payload && totalEarnedColumnRef.current !== 'total_earned') {
+      const nextValue = payload.total_earned;
+      delete payload.total_earned;
+      if (totalEarnedColumnRef.current === 'total_gems_earned') {
+        payload.total_gems_earned = nextValue;
+      }
+    }
+
+    const runUpdate = async (currentPayload: Record<string, unknown>) =>
+      supabase.from('profiles').update(currentPayload).eq('user_id', user.id).select().single();
+
+    let { data, error } = await runUpdate(payload);
+
+    if (error && /\btotal_earned\b/i.test(error.message || '') && Object.prototype.hasOwnProperty.call(payload, 'total_earned')) {
+      totalEarnedColumnRef.current = null;
+      delete payload.total_earned;
+      if (Object.keys(payload).length > 0) {
+        const retry = await runUpdate(payload);
+        data = retry.data;
+        error = retry.error;
+      } else {
+        error = null;
+      }
+    }
+
+    if (error && /\btotal_gems_earned\b/i.test(error.message || '') && Object.prototype.hasOwnProperty.call(payload, 'total_gems_earned')) {
+      totalEarnedColumnRef.current = null;
+      delete payload.total_gems_earned;
+      if (Object.keys(payload).length > 0) {
+        const retry = await runUpdate(payload);
+        data = retry.data;
+        error = retry.error;
+      } else {
+        error = null;
+      }
+    }
+
+    if (error) {
+      throw new Error(error.message || 'Failed to update profile');
+    }
+
+    if (data) {
+      syncCurrencyColumn(data);
+      syncTotalEarnedColumn(data);
+      setProfile(data);
+    }
   }, [user]);
 
   const completeTask = useCallback(async (taskId: string, mcqVerified: boolean) => {
     if (!user || !profile) return;
 
-    const currentCoins = Number(profile.coins ?? 0);
-    const currentTotalEarned = Number(profile.total_earned ?? 0);
+    const currentGems = readGems(profile);
+    const currentTotalEarned = readTotalEarned(profile);
     const currentStreak = Number(profile.streak ?? 0);
 
     // Update task
@@ -122,11 +235,11 @@ export function useNemoData(): NemoData {
     const totalBonus = actualCoins + streakBonus;
 
     await updateProfile({
-      coins: currentCoins + totalBonus,
-      total_earned: currentTotalEarned + totalBonus,
+      [currencyColumnRef.current]: currentGems + totalBonus,
+      ...buildTotalEarnedUpdate(currentTotalEarned + totalBonus),
       streak: newStreak,
       last_active: today,
-    });
+    } as Partial<Profile>);
 
     // Check badges
     const completedCount = tasks.filter(t => t.completed).length + 1;
@@ -136,7 +249,7 @@ export function useNemoData(): NemoData {
       { id: 'tasks50', condition: completedCount >= 50 },
       { id: 'streak5', condition: newStreak >= 5 },
       { id: 'streak30', condition: newStreak >= 30 },
-      { id: 'coins100', condition: (currentCoins + totalBonus) >= 100 },
+      { id: 'coins100', condition: (currentGems + totalBonus) >= 100 },
       { id: 'coins_earned_200', condition: (currentTotalEarned + totalBonus) >= 200 },
     ];
 
@@ -160,8 +273,8 @@ export function useNemoData(): NemoData {
 
   const purchaseItem = useCallback(async (itemId: string, price: number) => {
     if (!user || !profile) return;
-    const currentCoins = Number(profile.coins ?? 0);
-    if (currentCoins < price) return;
+    const currentGems = readGems(profile);
+    if (currentGems < price) return;
 
     const { error: itemInsertError } = await supabase
       .from('user_items')
@@ -174,9 +287,9 @@ export function useNemoData(): NemoData {
     const { data: updatedProfile, error: profileUpdateError } = await supabase
       .from('profiles')
       .update({
-        coins: currentCoins - price,
+        [currencyColumnRef.current]: currentGems - price,
         equipped_item: itemId,
-      })
+      } as Record<string, unknown>)
       .eq('user_id', user.id)
       .select()
       .single();
@@ -186,6 +299,7 @@ export function useNemoData(): NemoData {
     }
 
     if (updatedProfile) {
+      syncCurrencyColumn(updatedProfile);
       setProfile(updatedProfile);
     }
 
@@ -205,20 +319,98 @@ export function useNemoData(): NemoData {
   const generatePlan = useCallback(async (placementDate: string, targetRole: string, hoursPerDay: number, name: string, gender: 'boy' | 'girl', referredBy?: string) => {
     if (!user) return;
 
-    const startCoins = referredBy ? 50 : 0;
+    const startGems = referredBy ? 50 : 0;
 
-    // Update profile
-    await updateProfile({
+    const baseProfilePayload = {
+      user_id: user.id,
       name: name.toUpperCase(),
       placement_date: placementDate,
       target_role: targetRole,
       hours_per_day: hoursPerDay,
       gender,
-      coins: startCoins,
-      total_earned: startCoins,
       referred_by: referredBy || null,
       onboarding_complete: true,
-    });
+      current_stage: 'Foundations',
+    };
+
+    let activeCurrencyColumn: 'coins' | 'gems' = currencyColumnRef.current;
+    let activeTotalColumn: 'total_earned' | 'total_gems_earned' | null = totalEarnedColumnRef.current;
+    let profileData: Profile | null = null;
+    let profileError: Error | null = null;
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const upsertPayload: Record<string, unknown> = {
+        ...baseProfilePayload,
+        [activeCurrencyColumn]: startGems,
+      };
+
+      if (activeTotalColumn === 'total_earned') {
+        upsertPayload.total_earned = startGems;
+      } else if (activeTotalColumn === 'total_gems_earned') {
+        upsertPayload.total_gems_earned = startGems;
+      }
+
+      const result = await supabase
+        .from('profiles')
+        .upsert(upsertPayload, { onConflict: 'user_id' })
+        .select()
+        .single();
+
+      if (!result.error) {
+        profileData = result.data;
+        profileError = null;
+        break;
+      }
+
+      const message = result.error.message || '';
+
+      if (activeCurrencyColumn === 'coins' && /\bcoins\b/i.test(message)) {
+        activeCurrencyColumn = 'gems';
+        continue;
+      }
+
+      if (activeCurrencyColumn === 'gems' && /\bgems\b/i.test(message)) {
+        activeCurrencyColumn = 'coins';
+        continue;
+      }
+
+      if (activeTotalColumn === 'total_earned' && /\btotal_earned\b/i.test(message)) {
+        activeTotalColumn = null;
+        continue;
+      }
+
+      if (activeTotalColumn === 'total_gems_earned' && /\btotal_gems_earned\b/i.test(message)) {
+        activeTotalColumn = null;
+        continue;
+      }
+
+      profileError = new Error(message || 'Failed to save onboarding profile');
+      break;
+    }
+
+    if (profileData) {
+      currencyColumnRef.current = activeCurrencyColumn;
+      totalEarnedColumnRef.current = activeTotalColumn;
+    }
+
+    if (profileError) {
+      throw new Error(profileError.message || 'Failed to save onboarding profile');
+    }
+
+    if (profileData) {
+      syncCurrencyColumn(profileData);
+      syncTotalEarnedColumn(profileData);
+      setProfile(profileData);
+    }
+
+    const { error: clearTasksError } = await supabase
+      .from('tasks')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (clearTasksError) {
+      throw new Error(clearTasksError.message || 'Failed to reset existing tasks');
+    }
 
     // Generate tasks
     const start = new Date(); start.setHours(0, 0, 0, 0);
@@ -275,11 +467,14 @@ export function useNemoData(): NemoData {
 
     // Insert in batches of 50
     for (let i = 0; i < taskInserts.length; i += 50) {
-      await supabase.from('tasks').insert(taskInserts.slice(i, i + 50));
+      const { error: taskInsertError } = await supabase.from('tasks').insert(taskInserts.slice(i, i + 50));
+      if (taskInsertError) {
+        throw new Error(taskInsertError.message || 'Failed to generate tasks');
+      }
     }
 
     await fetchAll(false);
-  }, [user, updateProfile, fetchAll]);
+  }, [user, fetchAll]);
 
   const resetPlan = useCallback(async () => {
     if (!user) return;
@@ -287,9 +482,12 @@ export function useNemoData(): NemoData {
     await supabase.from('user_badges').delete().eq('user_id', user.id);
     await supabase.from('user_items').delete().eq('user_id', user.id);
     await updateProfile({
-      coins: 0, total_earned: 0, streak: 0, last_active: null,
+      [currencyColumnRef.current]: 0,
+      ...buildTotalEarnedUpdate(0),
+      streak: 0,
+      last_active: null,
       equipped_item: null, onboarding_complete: false, current_stage: 'Foundations',
-    });
+    } as Partial<Profile>);
     await fetchAll(false);
   }, [user, updateProfile, fetchAll]);
 

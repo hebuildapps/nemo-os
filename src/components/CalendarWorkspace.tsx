@@ -67,14 +67,14 @@ const CalendarWorkspace: React.FC<CalendarWorkspaceProps> = ({ tasks, onComplete
       <div className="flex items-center bg-[#152337] text-[#f9d362] justify-between mb-[10px]">
         <button
           onClick={() => nav(-1)}
-          className="bg-transparent w-[30px] h-[30px] font-pixel  text-[10px] text-[#f9d362] hover:text-[#ffffff] hover:border-[#64676a] cursor-pointer transition-colors border border-solid border-black rounded-lg hover:text-foreground"
+          className="bg-transparent w-[30px] h-[30px] font-pixel text-[10px] text-[#f9d362] hover:text-[#a8a8a5] hover:border-[#64676a] cursor-pointer transition-colors border border-solid border-black rounded-lg hover:text-foreground"
         >
           ◀
         </button>
         <span className="font-pixel text-[10px] text-[#f9d362]">{MONTHS[month]} {year}</span>
         <button
           onClick={() => nav(1)}
-          className="bg-transparent w-[30px] h-[30px] font-pixel text-[10px] text-[#f9d362] hover:text-[#ffffff] hover:border-[#64676a] cursor-pointer transition-colors border border-solid border-black rounded-lg hover:text-foreground"
+          className="bg-transparent w-[30px] h-[30px] font-pixel text-[10px] text-[#f9d362] hover:text-[#a8a8a5] hover:border-[#64676a] cursor-pointer transition-colors border border-solid border-black rounded-lg hover:text-foreground"
         >
           ▶
         </button>

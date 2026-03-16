@@ -29,7 +29,7 @@ const companionImageCandidates = (itemId: string) => [
 
 const ShopWorkspace: React.FC<ShopWorkspaceProps> = ({ profile, shopItems, userItems, onBuy, onEquip }) => {
   const ownedIds = new Set(userItems.map(i => i.item_id));
-  const gems = Number(profile.coins ?? 0);
+  const gems = Number(((profile as Profile & { gems?: number }).gems ?? profile.coins ?? 0));
 
   return (
     <div>

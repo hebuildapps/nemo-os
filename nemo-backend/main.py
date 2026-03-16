@@ -1,16 +1,36 @@
 import json
 import os
+from pathlib import Path
 from typing import List
 
+import boto3
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from google import genai
-from google.genai import types
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
+def load_local_env() -> None:
+    env_path = Path(__file__).with_name(".env")
+    if not env_path.exists():
+        return
+
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+load_local_env()
+
+bedrock = boto3.client(
+    service_name="bedrock-runtime",
+    region_name="us-south-1",
+    aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY")
+)
 
 app = FastAPI()
 
@@ -37,11 +57,38 @@ class McqResponse(BaseModel):
     options: List[str]
     correct: int
 
+
+def require_aws_credentials() -> None:
+    if not os.environ.get("AWS_ACCESS_KEY_ID") or not os.environ.get("AWS_SECRET_ACCESS_KEY"):
+        raise HTTPException(status_code=500, detail="AWS Bedrock credentials are not configured")
+
+
+def invoke_nova_lite(prompt: str) -> str:
+    require_aws_credentials()
+
+    body = json.dumps({
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "inferenceConfig": {
+            "max_new_tokens": 300,
+            "temperature": 0.7
+        }
+    })
+
+    response = bedrock.invoke_model(
+        modelId="global.amazon.nova-2-lite-v1:0",
+        body=body
+    )
+
+    response_body = json.loads(response["body"].read())
+    return response_body["output"]["message"]["content"][0]["text"]
+
 @app.post("/stage-briefing")
 async def stage_briefing(req: StageRequest):
-    if not client:
-        raise HTTPException(status_code=500, detail="GEMINI_API_KEY is not configured")
-
     prompt = f"""
     You are the narrator of a gamified coding prep journey called Nemo OS.
 
@@ -64,12 +111,11 @@ async def stage_briefing(req: StageRequest):
     Keep total response under 120 words. Make it feel epic but grounded.
     """
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt,
-    )
+    try:
+        text = invoke_nova_lite(prompt)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to generate stage briefing: {exc}") from exc
 
-    text = response.text
     return {
         "title": extract_section(text, "TITLE"),
         "narrative": extract_section(text, "NARRATIVE"),
@@ -82,9 +128,6 @@ async def stage_briefing(req: StageRequest):
 
 @app.post("/api/generate-mcq", response_model=McqResponse)
 async def generate_mcq(req: McqRequest):
-    if not client:
-        raise HTTPException(status_code=500, detail="GEMINI_API_KEY is not configured")
-
     prompt = (
         f"You are a quiz generator for software engineering interview preparation.\n\n"
         f"Generate exactly 1 multiple-choice question to validate understanding of the given topic.\n\n"
@@ -95,15 +138,8 @@ async def generate_mcq(req: McqRequest):
     )
 
     try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-            ),
-        )
-
-        data = json.loads(response.text)
+        text = invoke_nova_lite(prompt)
+        data = json.loads(text)
         mcq = McqResponse(**data)
 
         if len(mcq.options) != 4:

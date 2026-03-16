@@ -64,6 +64,7 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
   const characterSrc = `/${gender}_${mood}.png`;
   const equippedImageCandidates = profile.equipped_item ? companionImageCandidates(profile.equipped_item) : [];
   const displayName = (profile.name || 'NEMO').replace(/[.]+$/g, '').trim();
+  const gems = Number(((profile as Profile & { gems?: number }).gems ?? profile.coins ?? 0));
 
   // Sentiment text
   let sentimentText = `${displayName} is prepping`;
@@ -154,7 +155,7 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
 
         <div
           className="mt-[2px] inline-flex items-center gap-[6px] px-[8px] py-[4px] border border-border/80 bg-surface2/70 rounded-[4px]"
-          aria-label={`Current gems: ${profile.coins}`}
+          aria-label={`Current gems: ${gems}`}
         >
           <img
             src="/diamond.png"
@@ -163,7 +164,7 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
             style={{ imageRendering: 'pixelated' }}
           />
           <span className="font-pixel text-[7px] text-coin tabular-nums">
-            {compactGems(profile.coins ?? 0)} GEMS
+            {compactGems(gems)} GEMS
           </span>
         </div>
       </div>

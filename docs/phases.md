@@ -8,7 +8,7 @@
 - Stage-based plan generation with breaks
 - Calendar workspace
 - Tasks workspace with filters
-- AI MCQ validation (Lovable AI gateway)
+- AI MCQ validation (Gemini API)
 - Coins economy
 - Badges system
 - Shop with cosmetic items

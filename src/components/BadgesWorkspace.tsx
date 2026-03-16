@@ -20,6 +20,8 @@ interface BadgeProgress {
   target: number;
 }
 
+const profileGems = (profile: Profile) => Number(((profile as Profile & { gems?: number }).gems ?? profile.coins ?? 0));
+
 const currencyWordToGems = (text: string) =>
   text
     .replace(/\bCOINS\b/g, 'GEMS')
@@ -60,7 +62,7 @@ const getBadgeProgress = (
     case 'stage_coredsa':
       return stageProgress(tasks, 'Core DSA');
     case 'coins100':
-      return { current: Math.min(Number(profile.coins ?? 0), 100), target: 100 };
+      return { current: Math.min(profileGems(profile), 100), target: 100 };
     case 'shopper':
       return { current: Math.min(userItems.length, 1), target: 1 };
     case 'coins_earned_200':

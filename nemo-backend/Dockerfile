@@ -5,9 +5,3 @@ RUN pip install -r requirements.txt
 COPY . .
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
 
-
-gcloud run deploy nemo-backend \
-  --source . \
-  --region us-central1 \
-  --allow-unauthenticated \
-  --set-env-vars GEMINI_API_KEY=

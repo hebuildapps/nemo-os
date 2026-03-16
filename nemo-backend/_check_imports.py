@@ -6,6 +6,6 @@ import uvicorn
 print("uvicorn OK")
 import pydantic
 print("pydantic OK:", pydantic.__version__)
-from google import genai
-print("google-genai OK")
+import boto3
+print("boto3 OK:", boto3.__version__)
 print("ALL IMPORTS OK")

@@ -14,7 +14,7 @@ interface ProfileWorkspaceProps {
 const ProfileWorkspace: React.FC<ProfileWorkspaceProps> = ({ profile, tasks, onReset }) => {
   const { signOut } = useAuth();
   const done = tasks.filter(t => t.completed).length;
-  const gems = Number(profile.coins ?? 0);
+  const gems = Number(((profile as Profile & { gems?: number }).gems ?? profile.coins ?? 0));
 
   const copyRef = () => {
     navigator.clipboard.writeText(profile.referral_code).catch(() => {});
@@ -26,7 +26,7 @@ const ProfileWorkspace: React.FC<ProfileWorkspaceProps> = ({ profile, tasks, onR
 
   return (
     <div>
-      <div className="font-pixel text-[10px] bg-[#152337] text-[#f9d362] p-2 text-foreground mb-[18px] pb-[10px] border-b-2 border-border flex items-center gap-2">
+      <div className="font-pixel text-[10px] bg-[#152337] text-[#f9d362] p-2 mb-[18px] pb-[10px] border-b-2 border-border flex items-center gap-2">
         <img src="/profile.svg" alt="profile" className="w-[22px] h-[32px]" /> PROFILE
       </div>
 

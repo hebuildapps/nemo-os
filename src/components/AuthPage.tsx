@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { Eye, EyeOff } from 'lucide-react';
 
 const AuthPage: React.FC = () => {
   const { signIn, signUp } = useAuth();
@@ -7,6 +8,7 @@ const AuthPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
@@ -63,18 +65,30 @@ const AuthPage: React.FC = () => {
         />
 
         <label className="font-pixel text-[7px] text-muted-foreground block mb-[5px]">PASSWORD</label>
-        <input
-          type="password" value={password} onChange={e => setPassword(e.target.value)}
-          placeholder="••••••••"
-          className="w-full p-[9px_11px] border-[1.5px] border-border bg-surface2 font-mono text-[12px] mb-[14px] text-foreground outline-none focus:border-primary"
-        />
+        <div className="relative mb-[14px]">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="••••••••"
+            className="w-full p-[9px_11px] pr-[36px] border-[1.5px] border-border bg-surface2 font-mono text-[12px] text-foreground outline-none focus:border-primary"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(prev => !prev)}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            className="absolute right-[8px] top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+          </button>
+        </div>
 
         <button
           onClick={handleSubmit}
           disabled={loading}
           className="font-pixel text-[9px] p-[13px] w-full bg-primary text-primary-foreground border-none cursor-pointer mt-[6px] transition-opacity hover:opacity-85 disabled:opacity-50"
         >
-          {loading ? 'PROCESSING...' : isSignUp ? 'CREATE ACCOUNT →' : 'SIGN IN →'}
+          {loading ? 'PROCESSING...' : isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}
         </button>
 
         <button
