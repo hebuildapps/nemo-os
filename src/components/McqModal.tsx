@@ -46,6 +46,9 @@ const isValidMcq = (value: unknown): value is McqData => {
 const formatDifficulty = (difficulty: string) =>
   difficulty ? difficulty.charAt(0).toUpperCase() + difficulty.slice(1).toLowerCase() : 'Medium';
 
+const backendBaseUrl = import.meta.env.VITE_BACKEND_URL?.replace(/\/+$/, '');
+const MCQ_ENDPOINT = backendBaseUrl ? `${backendBaseUrl}/api/generate-mcq` : '/api/generate-mcq';
+
 const McqModal: React.FC<McqModalProps> = ({ task, onCorrect, onClose }) => {
   const [mcq, setMcq] = useState<McqData | null>(null);
   const [loadingMcq, setLoadingMcq] = useState(true);
@@ -64,7 +67,7 @@ const McqModal: React.FC<McqModalProps> = ({ task, onCorrect, onClose }) => {
       setIsCorrect(false);
 
       try {
-        const response = await fetch('/api/generate-mcq', {
+        const response = await fetch(MCQ_ENDPOINT, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

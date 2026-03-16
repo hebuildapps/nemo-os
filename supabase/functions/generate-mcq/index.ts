@@ -50,35 +50,20 @@ serve(async (req: Request) => {
     const stage = payload.stage ?? "";
     const taskDescription = payload.taskDescription ?? "";
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not configured");
+    const NEMO_BACKEND_URL = Deno.env.get("NEMO_BACKEND_URL");
+    if (!NEMO_BACKEND_URL) throw new Error("NEMO_BACKEND_URL is not configured");
 
-    const prompt = `Generate a single multiple choice question to test a software engineering student's understanding of ${topic} at ${difficulty} level.
-
-Return your response in this exact JSON format with no extra text, no markdown, no backticks:
-{
-  "question": "the question text here",
-  "options": ["option A", "option B", "option C", "option D"],
-  "correct": 0
-}
-
-Where "correct" is the zero-based index of the correct answer in the options array.
-
-Make the question specific and practical, not theoretical. Difficulty is ${difficulty}. Topic is ${topic}.
-${stage ? `Stage context: ${stage}.` : ""}
-${taskDescription ? `Task context: ${taskDescription}.` : ""}`;
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const backendBaseUrl = NEMO_BACKEND_URL.replace(/\/+$/, "");
+    const response = await fetch(`${backendBaseUrl}/api/generate-mcq`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.6,
-        },
+        topic,
+        difficulty,
+        stage,
+        taskDescription,
       }),
     });
 
@@ -96,20 +81,19 @@ ${taskDescription ? `Task context: ${taskDescription}.` : ""}`;
         });
       }
       const errText = await response.text();
-      console.error("Gemini API error:", response.status, errText);
-      throw new Error("Gemini API error");
+      console.error("Amazon Nova backend error:", response.status, errText);
+      throw new Error("Amazon Nova backend error");
     }
 
-    const data = await response.json();
+    const data: unknown = await response.json();
+    let mcq: unknown = data;
 
-    let mcq: unknown = null;
-    const textPart = data?.candidates?.[0]?.content?.parts?.find((part: { text?: unknown }) => typeof part?.text === "string")?.text;
-
-    if (typeof textPart === "string") {
+    if (typeof mcq === "string") {
+      const mcqText = mcq;
       try {
-        mcq = JSON.parse(textPart);
+        mcq = JSON.parse(mcqText);
       } catch {
-        const jsonMatch = textPart.match(/\{[\s\S]*\}/);
+        const jsonMatch = mcqText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           mcq = JSON.parse(jsonMatch[0]);
         }

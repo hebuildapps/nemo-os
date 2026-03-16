@@ -8,7 +8,7 @@
 - Stage-based plan generation with breaks
 - Calendar workspace
 - Tasks workspace with filters
-- AI MCQ validation (Gemini API)
+- AI MCQ validation (Amazon Nova via Amazon Bedrock)
 - Coins economy
 - Badges system
 - Shop with cosmetic items

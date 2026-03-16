@@ -5,7 +5,7 @@ AI-powered software interview preparation. Students get a personalised day-by-da
 ## Features
 
 - Deterministic stage-based prep plan.
-- AI-generated MCQ validation via Gemini.
+- AI-generated MCQ validation via Amazon Nova (Amazon Bedrock).
 - Pixel art character with gender selection and mood states.
 - Pokemon companions from shop.
 - Streak and diamond reward system.
@@ -15,20 +15,20 @@ AI-powered software interview preparation. Students get a personalised day-by-da
 
 ## Tech Stack
 
-- Next.js 14.
+- React + Vite.
 - TypeScript.
 - TailwindCSS.
 - Supabase (PostgreSQL).
-- Google Gemini AI.
+- Amazon Nova Lite (Amazon Bedrock).
 - FastAPI Python backend.
 
 ## Architecture
 
-Frontend (Next.js) -> Supabase (auth + database) -> FastAPI backend -> Gemini AI for MCQ generation.
+Frontend (React/Vite) -> Supabase (auth + database) -> FastAPI backend -> Amazon Nova Lite via Amazon Bedrock for MCQ generation.
 
 ## AI Integration
 
-When a user completes a task, a live Gemini API call generates a unique MCQ specific to the topic and difficulty. No two attempts see the same question.
+When a user completes a task, a live Amazon Nova Lite call (via Amazon Bedrock) generates a unique MCQ specific to the topic and difficulty. No two attempts see the same question.
 
 ## How to Run Locally
 

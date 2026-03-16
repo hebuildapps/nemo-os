@@ -11,7 +11,10 @@ const root = createRoot(rootElement);
 
 const requiredEnv = [
 	{ key: "VITE_SUPABASE_URL", value: import.meta.env.VITE_SUPABASE_URL },
-	{ key: "VITE_SUPABASE_PUBLISHABLE_KEY", value: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+	{
+		key: "VITE_SUPABASE_PUBLISHABLE_KEY (or VITE_SUPABASE_ANON_KEY)",
+		value: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY,
+	},
 ];
 
 const missingEnv = requiredEnv.filter((entry) => !entry.value);
