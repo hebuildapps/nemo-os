@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import TaskCard from './TaskCard';
+import { stageColor, stageBorderColor, stageTextColor } from '@/lib/nemo-data';
 import type { Database } from '@/integrations/supabase/types';
 
 type TaskRow = Database['public']['Tables']['tasks']['Row'];
@@ -12,13 +12,35 @@ interface CalendarWorkspaceProps {
 const MONTHS = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
 const DAYS = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 
+const getDifficultyClass = (difficulty: string) =>
+  difficulty === 'easy'
+    ? 'border-nemo-green text-nemo-green'
+    : difficulty === 'hard'
+      ? 'border-nemo-red text-nemo-red'
+      : 'border-coin text-coin';
+
+const toLocalIsoDate = (date: Date) => {
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().split('T')[0];
+};
+
+const getDateParts = (isoDate: string) => {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  return {
+    day: String(day).padStart(2, '0'),
+    month: MONTHS[month - 1],
+    year: String(year),
+  };
+};
+
 const CalendarWorkspace: React.FC<CalendarWorkspaceProps> = ({ tasks, onComplete }) => {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
   const [selDate, setSelDate] = useState<string | null>(null);
+  const [showDayTasks, setShowDayTasks] = useState(false);
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = toLocalIsoDate(new Date());
 
   const byDate = useMemo(() => {
     const m: Record<string, TaskRow[]> = {};
@@ -38,9 +60,10 @@ const CalendarWorkspace: React.FC<CalendarWorkspaceProps> = ({ tasks, onComplete
   };
 
   const selectedTasks = selDate ? (byDate[selDate] || []) : [];
+  const selectedDateParts = selDate ? getDateParts(selDate) : null;
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col relative">
       <div className="flex items-center justify-between mb-[10px]">
         <button
           onClick={() => nav(-1)}
@@ -79,33 +102,129 @@ const CalendarWorkspace: React.FC<CalendarWorkspaceProps> = ({ tasks, onComplete
           const isFuture = ds > today;
 
           let cls = 'flex flex-col items-center justify-center gap-[2px] rounded-xl text-[14px] cursor-pointer transition-colors';
-          if (isSelected) cls += ' text-[#F2F2F7]bg-[#f8f8f8] text-foreground';
+          if (isSelected) cls += ' bg-[#1f1f20] text-white';
           else if (isToday) cls += ' text-[#1A1A1A] bg-[#E5E0D8] text-foreground';
           else if (allDone) cls += ' text-[#F2F2F7] bg-[#50C878] text-foreground/80';
+          else if (isFuture) cls += ' text-[#1A1A1A] bg-[#cec8b8] hover:bg-[#d6cfbf]';
           else if (hasBreak) cls += ' text-[#F2F2F7] bg-[#cec8b8] opacity-60 text-foreground/75';
-          else if (hasTasks && !isFuture) cls += ' bg-[#c4c4c4] text-foreground/75 hover:bg-[#c9c9c9]';
+          else if (hasTasks) cls += ' bg-[#c4c4c4] text-foreground/75 hover:bg-[#c9c9c9]';
           else cls += ' text-[#F2F2F7] bg-[#434345] text-foreground/65 hover:bg-[#d0d0d0]';
 
           const dotCls = isSelected
-            ? 'bg-foreground/70'
+            ? 'bg-white/80'
             : allDone
               ? 'bg-[#C2B280]'
               : 'bg-foreground/35';
 
           return (
-            <div key={d} className={cls} onClick={() => setSelDate(ds)}>
+            <div
+              key={d}
+              className={cls}
+              onClick={() => {
+                setSelDate(ds);
+                setShowDayTasks(true);
+              }}
+            >
               {d}
-              {hasTasks && <div className={`w-[4px] h-[4px] bg-[#C2B280] ${dotCls}`} />}
+              {hasTasks && <div className={`w-[4px] h-[4px] ${dotCls}`} />}
             </div>
           );
           })}
         </div>
       </div>
 
-      {selDate && selectedTasks.length > 0 && (
-        <div className="mt-[12px] pt-[10px] border-t border-border/40 max-h-[34%] overflow-y-auto">
-          <div className="font-pixel text-[8px] text-muted-foreground mb-[10px]">TASKS — {selDate}</div>
-          {selectedTasks.map(t => <TaskCard key={t.id} task={t} onComplete={onComplete} />)}
+      {showDayTasks && selDate && selectedDateParts && (
+        <div className="absolute inset-0 z-40 flex flex-col justify-end">
+          <button
+            type="button"
+            onClick={() => setShowDayTasks(false)}
+            className="absolute inset-0 bg-black/16 backdrop-blur-[1px]"
+            aria-label="Close selected day tasks"
+          />
+
+          <div className="relative w-full max-h-[78%] bg-[#2C2C2E] border-t border-[#434345] rounded-t-[14px] shadow-[0_-10px_28px_rgba(0,0,0,0.35)] animate-in slide-in-from-bottom-8 duration-200">
+            <div className="h-full min-h-0 grid grid-cols-[120px_1fr] max-md:grid-cols-1">
+              <div className="bg-[#36363a] border-r border-[#4a4a50] max-md:border-r-0 max-md:border-b p-[12px] flex flex-col items-center justify-center gap-[8px]">
+                <div className="font-pixel text-[7px] text-[#d1d1d6]/80">{selectedDateParts.month}</div>
+                <div className="font-pixel text-[22px] leading-none text-[#f2f2f7]">{selectedDateParts.day}</div>
+                <div className="font-pixel text-[7px] text-[#d1d1d6]/80">{selectedDateParts.year}</div>
+              </div>
+
+              <div className="min-h-0 flex flex-col">
+                <div className="flex items-center justify-between p-[10px] border-b border-[#4a4a50]">
+                  <div className="font-pixel text-[8px] text-[#f2f2f7]/90">TASKS — {selDate}</div>
+                  <button
+                    type="button"
+                    onClick={() => setShowDayTasks(false)}
+                    className="font-pixel text-[7px] px-[8px] py-[4px] border border-[#5a5a62] text-[#d1d1d6]/85 hover:text-[#f2f2f7]"
+                  >
+                    CLOSE
+                  </button>
+                </div>
+
+                <div className="flex-1 min-h-0 overflow-y-auto p-[10px] space-y-[9px]">
+                  {selectedTasks.length === 0 && (
+                    <div className="h-full border border-dashed border-[#5a5a62] bg-[#36363a] flex items-center justify-center text-[11px] text-[#d1d1d6]/85">
+                      No tasks for this date.
+                    </div>
+                  )}
+
+                  {selectedTasks.map(t => {
+                    const diffCls = getDifficultyClass(t.difficulty);
+
+                    return (
+                      <div key={t.id} className={`bg-[#36363a] border-[1.5px] border-[#4a4a50] p-[12px] ${t.completed ? 'opacity-80' : ''}`}>
+                        <div className="font-pixel text-[7px] mb-[6px] leading-[1.7] text-[#f2f2f7]">
+                          {t.is_break ? '☕ ' : ''}{t.title}
+                        </div>
+
+                        <div className="text-[11px] text-[#d1d1d6]/90 mb-[8px] leading-[1.45]">{t.description}</div>
+
+                        <div className="flex gap-[6px] flex-wrap mb-[8px]">
+                          <span
+                            className="font-pixel text-[6px] px-[7px] py-[2px] border inline-flex items-center justify-center text-center leading-none"
+                            style={{
+                              background: stageColor(t.stage_key),
+                              borderColor: stageBorderColor(t.stage_key),
+                              color: stageTextColor(t.stage_key),
+                            }}
+                          >
+                            {t.stage}
+                          </span>
+                          <span className={`font-pixel text-[6px] px-[7px] py-[2px] border inline-flex items-center justify-center text-center leading-none ${diffCls}`}>{t.difficulty.toUpperCase()}</span>
+                          {t.is_break && <span className="font-pixel text-[6px] px-[7px] py-[2px] border border-coin text-coin inline-flex items-center justify-center text-center leading-none">BREAK</span>}
+                          {t.completed && <span className="font-pixel text-[6px] px-[7px] py-[2px] border border-nemo-green text-nemo-green inline-flex items-center justify-center text-center leading-none">✓ DONE</span>}
+                          <span className="font-pixel text-[6px] px-[7px] py-[2px] border border-[#5a5a62] text-[#d1d1d6]/90 bg-[#2C2C2E] inline-flex items-center justify-center text-center leading-none gap-[4px]">
+                            <img
+                              src="/diamond.png"
+                              alt="gems"
+                              className="w-[14px] h-[14px] shrink-0"
+                              style={{ imageRendering: 'pixelated' }}
+                            />
+                            +{t.coins_reward}
+                          </span>
+                        </div>
+
+                        {!t.completed ? (
+                          <button
+                            type="button"
+                            onClick={() => onComplete(t.id)}
+                            className={`font-pixel text-[8px] px-[14px] py-[7px] border-none cursor-pointer transition-opacity hover:opacity-85 ${t.is_break ? 'bg-coin' : 'bg-primary'} text-primary-foreground`}
+                          >
+                            {t.is_break ? '☕ TAKE BREAK' : '✓ DONE?'}
+                          </button>
+                        ) : (
+                          <div className="font-pixel text-[7px] text-nemo-green">
+                            ✓ COMPLETED{t.mcq_verified ? ' + MCQ VERIFIED' : ''}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

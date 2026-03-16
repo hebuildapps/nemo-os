@@ -57,7 +57,10 @@ const Index: React.FC = () => {
       toast(`Not enough gems! Need ${price}, have ${nemo.profile.coins}`);
       return;
     }
-    nemo.purchaseItem(id, price).then(() => toast('✓ Purchased!'));
+    nemo
+      .purchaseItem(id, price)
+      .then(() => toast('✓ Purchased and equipped!'))
+      .catch(() => toast('Purchase failed. Please try again.'));
   }, [nemo]);
 
   const handleEquip = useCallback((id: string | null) => {
@@ -70,7 +73,7 @@ const Index: React.FC = () => {
       toast(
         <span className="inline-flex items-center gap-1">
           <img
-            src="/public/diamond.png"
+            src="/diamond.png"
             alt="gem"
             className="w-[16px] h-[16px] shrink-0"
             style={{ imageRendering: 'pixelated' }}

@@ -122,12 +122,9 @@ export const BADGE_DEFS: BadgeDef[] = [
 ];
 
 export const SHOP_ITEMS: ShopItem[] = [
-  { id: 'hat', name: 'COWBOY HAT', price: 30, ico: '🤠', type: 'hat', desc: 'Classic frontier style' },
-  { id: 'glasses', name: 'COOL GLASSES', price: 25, ico: '🕶️', type: 'glasses', desc: 'Stay stylish while grinding' },
-  { id: 'theme_dark', name: 'DARK MODE', price: 50, ico: '🌑', type: 'theme', desc: 'Night owl edition' },
-  { id: 'theme_warm', name: 'WARM THEME', price: 40, ico: '🌅', type: 'theme', desc: 'Cozy amber tones' },
-  { id: 'coin_boost', name: 'GEM BOOST', price: 80, ico: '⚡', type: 'boost', desc: '+2 bonus gems per task (7 days)' },
-  { id: 'theme_matrix', name: 'MATRIX THEME', price: 65, ico: '💚', type: 'theme', desc: 'Enter the matrix' },
+  { id: 'pikachu', name: 'PIKACHU', price: 30, ico: '⚡', type: 'companion', desc: 'Your electric companion' },
+  { id: 'starmie', name: 'STARMIE', price: 45, ico: '⭐', type: 'companion', desc: 'Master of the sea' },
+  { id: 'staryu', name: 'STARYU', price: 25, ico: '🌟', type: 'companion', desc: 'The star shape keeper' },
 ];
 
 // ===================== PLAN GENERATION =====================

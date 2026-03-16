@@ -20,16 +20,23 @@ const currencyWordToGems = (text: string) =>
     .replace(/\bcoins\b/g, 'gems')
     .replace(/\bcoin\b/g, 'gem');
 
+const companionImageCandidates = (itemId: string) => [
+  `/${itemId}_display.png`,
+  `/shop-items/${itemId}_display.png`,
+  `/${itemId}.png`,
+  `/shop-items/${itemId}.png`,
+];
+
 const ShopWorkspace: React.FC<ShopWorkspaceProps> = ({ profile, shopItems, userItems, onBuy, onEquip }) => {
   const ownedIds = new Set(userItems.map(i => i.item_id));
 
   return (
-    <div className="relative">
-      <div className="space-y-[12px] blur-[2px] saturate-75">
+    <div>
+      <div className="space-y-[12px]">
         <div className="font-pixel text-[10px] text-foreground mb-[18px] pb-[10px] border-b-2 border-border">🛒 SHOP</div>
         <div className="flex items-center gap-[10px] mb-[18px] p-[10px_14px] bg-surface border-[1.5px] border-border">
           <img
-            src="/public/diamond.png"
+            src="/diamond.png"
             alt="gem"
             className="w-[20px] h-[20px] shrink-0"
             style={{ imageRendering: 'pixelated' }}
@@ -41,6 +48,7 @@ const ShopWorkspace: React.FC<ShopWorkspaceProps> = ({ profile, shopItems, userI
           {shopItems.map(item => {
             const owned = ownedIds.has(item.id);
             const equipped = profile.equipped_item === item.id;
+            const imageCandidates = companionImageCandidates(item.id);
             let cls = 'bg-surface border-[1.5px] p-[14px] text-center cursor-pointer transition-all hover:border-primary';
             if (equipped) cls = 'bg-primary text-primary-foreground border-[1.5px] border-primary p-[14px] text-center cursor-pointer';
             else if (owned) cls += ' border-nemo-green';
@@ -53,7 +61,25 @@ const ShopWorkspace: React.FC<ShopWorkspaceProps> = ({ profile, shopItems, userI
 
             return (
               <div key={item.id} className={cls} onClick={handleClick}>
-                <span className="text-[30px] block mb-[7px]">{item.icon}</span>
+                <img
+                  src={imageCandidates[0]}
+                  alt={item.name}
+                  className="w-[48px] h-[48px] mx-auto mb-[7px] block"
+                  data-fallback-step="0"
+                  onError={(event) => {
+                    const currentStep = Number(event.currentTarget.dataset.fallbackStep || '0');
+                    const nextStep = currentStep + 1;
+
+                    if (nextStep < imageCandidates.length) {
+                      event.currentTarget.dataset.fallbackStep = String(nextStep);
+                      event.currentTarget.src = imageCandidates[nextStep];
+                      return;
+                    }
+
+                    event.currentTarget.onerror = null;
+                  }}
+                  style={{ imageRendering: 'pixelated' }}
+                />
                 <div className="font-pixel text-[6px] mb-[5px] leading-[1.5]">{currencyWordToGems(item.name)}</div>
                 <div className={`text-[10px] mb-[7px] leading-[1.4] ${equipped ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{currencyWordToGems(item.description)}</div>
                 {equipped ? (
@@ -63,7 +89,7 @@ const ShopWorkspace: React.FC<ShopWorkspaceProps> = ({ profile, shopItems, userI
                 ) : (
                   <div className="font-pixel text-[8px] text-coin flex items-center justify-center gap-1">
                     <img
-                      src="/public/diamond.png"
+                      src="/diamond.png"
                       alt="gem"
                       className="w-[16px] h-[16px] shrink-0"
                       style={{ imageRendering: 'pixelated' }}
@@ -74,13 +100,6 @@ const ShopWorkspace: React.FC<ShopWorkspaceProps> = ({ profile, shopItems, userI
               </div>
             );
           })}
-        </div>
-      </div>
-
-      <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-background/42 backdrop-blur-[6px]">
-        <div className="text-center px-[18px]">
-          <div className="font-pixel text-[15px] tracking-[1px] text-foreground">COMING SOON</div>
-          <div className="text-[12px] mt-[8px] text-muted-foreground">Good things take time.</div>
         </div>
       </div>
     </div>

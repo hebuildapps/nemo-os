@@ -36,7 +36,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onComplete }) => {
         <span className="font-pixel text-[6px] px-[7px] py-[2px] border border-border text-muted-foreground bg-surface2 inline-flex items-center justify-center text-center leading-none">📅 {t.date}</span>
         <span className="font-pixel text-[6px] px-[7px] py-[2px] border border-border text-muted-foreground bg-surface2 inline-flex items-center justify-center text-center leading-none gap-[4px]">
           <img
-            src="/public/diamond.png"
+            src="/diamond.png"
             alt="coin"
             className="w-[16px] h-[16px] shrink-0"
             style={{ imageRendering: 'pixelated' }}

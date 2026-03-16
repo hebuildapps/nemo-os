@@ -143,8 +143,31 @@ export function useNemoData(): NemoData {
     if (!user || !profile) return;
     if (profile.coins < price) return;
 
-    await supabase.from('user_items').insert({ user_id: user.id, item_id: itemId });
-    await updateProfile({ coins: profile.coins - price });
+    const { error: itemInsertError } = await supabase
+      .from('user_items')
+      .insert({ user_id: user.id, item_id: itemId });
+
+    if (itemInsertError) {
+      throw itemInsertError;
+    }
+
+    const { data: updatedProfile, error: profileUpdateError } = await supabase
+      .from('profiles')
+      .update({
+        coins: profile.coins - price,
+        equipped_item: itemId,
+      })
+      .eq('user_id', user.id)
+      .select()
+      .single();
+
+    if (profileUpdateError) {
+      throw profileUpdateError;
+    }
+
+    if (updatedProfile) {
+      setProfile(updatedProfile);
+    }
 
     // Check shopper badge
     const existingBadgeIds = new Set(userBadges.map(b => b.badge_id));
@@ -153,7 +176,7 @@ export function useNemoData(): NemoData {
     }
 
     await fetchAll();
-  }, [user, profile, userBadges, updateProfile, fetchAll]);
+  }, [user, profile, userBadges, fetchAll]);
 
   const equipItem = useCallback(async (itemId: string | null) => {
     await updateProfile({ equipped_item: itemId });
