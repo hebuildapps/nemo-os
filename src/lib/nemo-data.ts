@@ -116,7 +116,7 @@ export const BADGE_DEFS: BadgeDef[] = [
   { id: 'tasks50', ico: '🎓', name: 'SCHOLAR', desc: 'Complete 50 tasks', chk: (t) => completedCount(t) >= 50 },
   { id: 'stage_foundations', ico: '🏗️', name: 'FOUNDATIONS LAID', desc: 'Finish Foundations stage', chk: (t) => stageAllDone(t, 'Foundations') },
   { id: 'stage_coredsa', ico: '🧮', name: 'DSA WARRIOR', desc: 'Finish Core DSA stage', chk: (t) => stageAllDone(t, 'Core DSA') },
-  { id: 'coins100', ico: '💰', name: 'MONEYED', desc: 'Hold 100 gems', chk: (_, u) => u.coins >= 100 },
+  { id: 'coins100', ico: '💰', name: 'RICH', desc: 'Hold 100 gems', chk: (_, u) => u.coins >= 100 },
   { id: 'shopper', ico: '🛒', name: 'SHOPPER', desc: 'Purchase first shop item', chk: (_, __, items) => items.size >= 1 },
   { id: 'coins_earned_200', ico: '🏦', name: 'EARNER', desc: 'Earn 200 gems total', chk: (_, u) => (u.totalEarned || 0) >= 200 },
 ];

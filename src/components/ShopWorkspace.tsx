@@ -29,11 +29,14 @@ const companionImageCandidates = (itemId: string) => [
 
 const ShopWorkspace: React.FC<ShopWorkspaceProps> = ({ profile, shopItems, userItems, onBuy, onEquip }) => {
   const ownedIds = new Set(userItems.map(i => i.item_id));
+  const gems = Number(profile.coins ?? 0);
 
   return (
     <div>
       <div className="space-y-[12px]">
-        <div className="font-pixel text-[10px] text-foreground mb-[18px] pb-[10px] border-b-2 border-border">🛒 SHOP</div>
+        <div className="font-pixel text-[10px] text-foreground mb-[18px] pb-[10px] border-b-2 border-border flex items-center gap-2">
+          <img src="/shop.svg" alt="shop" className="w-[22px] h-[22px]" /> SHOP
+        </div>
         <div className="flex items-center gap-[10px] mb-[18px] p-[10px_14px] bg-surface border-[1.5px] border-border">
           <img
             src="/diamond.png"
@@ -41,7 +44,7 @@ const ShopWorkspace: React.FC<ShopWorkspaceProps> = ({ profile, shopItems, userI
             className="w-[20px] h-[20px] shrink-0"
             style={{ imageRendering: 'pixelated' }}
           />
-          <span className="font-pixel text-[9px] text-coin tabular-nums">{profile.coins} GEMS</span>
+          <span className="font-pixel text-[9px] text-coin tabular-nums">{gems} GEMS</span>
           <span className="text-[10px] text-muted-foreground ml-auto">spend wisely, warrior</span>
         </div>
         <div className="grid grid-cols-3 gap-[10px] max-md:grid-cols-2">

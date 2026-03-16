@@ -142,7 +142,7 @@ const CalendarWorkspace: React.FC<CalendarWorkspaceProps> = ({ tasks, onComplete
             aria-label="Close selected day tasks"
           />
 
-          <div className="relative w-full max-h-[78%] bg-[#2C2C2E] border-t border-[#434345] rounded-t-[14px] shadow-[0_-10px_28px_rgba(0,0,0,0.35)] animate-in slide-in-from-bottom-8 duration-200">
+          <div className="relative w-full max-h-[78%] bg-[#2C2C2E] border-t border-[#434345] rounded-xl shadow-[0_-10px_28px_rgba(0,0,0,0.35)] animate-in slide-in-from-bottom-8 duration-200">
             <div className="h-full min-h-0 grid grid-cols-[120px_1fr] max-md:grid-cols-1">
               <div className="bg-[#36363a] border-r border-[#4a4a50] max-md:border-r-0 max-md:border-b p-[12px] flex flex-col items-center justify-center gap-[8px]">
                 <div className="font-pixel text-[7px] text-[#d1d1d6]/80">{selectedDateParts.month}</div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { TASK_TEMPLATES, STAGES, STAGE_KEYS, STAGE_WEIGHTS, STAGE_BREAKS } from '@/lib/nemo-data';
@@ -41,10 +41,24 @@ export function useNemoData(): NemoData {
   const [shopItems, setShopItems] = useState<ShopItemRow[]>([]);
   const [userItems, setUserItems] = useState<UserItemRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const hasLoadedRef = useRef(false);
 
-  const fetchAll = useCallback(async () => {
-    if (!user) { setLoading(false); return; }
-    setLoading(true);
+  const fetchAll = useCallback(async (showLoader = false) => {
+    if (!user) {
+      setProfile(null);
+      setTasks([]);
+      setBadges([]);
+      setUserBadges([]);
+      setShopItems([]);
+      setUserItems([]);
+      setLoading(false);
+      hasLoadedRef.current = false;
+      return;
+    }
+
+    if (showLoader || !hasLoadedRef.current) {
+      setLoading(true);
+    }
 
     const [profileRes, tasksRes, badgesRes, userBadgesRes, shopRes, itemsRes] = await Promise.all([
       supabase.from('profiles').select('*').eq('user_id', user.id).single(),
@@ -55,17 +69,18 @@ export function useNemoData(): NemoData {
       supabase.from('user_items').select('*').eq('user_id', user.id),
     ]);
 
-    if (profileRes.data) setProfile(profileRes.data);
-    if (tasksRes.data) setTasks(tasksRes.data);
-    if (badgesRes.data) setBadges(badgesRes.data);
-    if (userBadgesRes.data) setUserBadges(userBadgesRes.data);
-    if (shopRes.data) setShopItems(shopRes.data);
-    if (itemsRes.data) setUserItems(itemsRes.data);
+    setProfile(profileRes.data ?? null);
+    setTasks(tasksRes.data ?? []);
+    setBadges(badgesRes.data ?? []);
+    setUserBadges(userBadgesRes.data ?? []);
+    setShopItems(shopRes.data ?? []);
+    setUserItems(itemsRes.data ?? []);
 
     setLoading(false);
+    hasLoadedRef.current = true;
   }, [user]);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => { fetchAll(true); }, [fetchAll]);
 
   const updateProfile = useCallback(async (updates: Partial<Profile>) => {
     if (!user) return;
@@ -75,6 +90,10 @@ export function useNemoData(): NemoData {
 
   const completeTask = useCallback(async (taskId: string, mcqVerified: boolean) => {
     if (!user || !profile) return;
+
+    const currentCoins = Number(profile.coins ?? 0);
+    const currentTotalEarned = Number(profile.total_earned ?? 0);
+    const currentStreak = Number(profile.streak ?? 0);
 
     // Update task
     await supabase.from('tasks').update({ completed: true, mcq_verified: mcqVerified }).eq('id', taskId);
@@ -87,13 +106,13 @@ export function useNemoData(): NemoData {
 
     // Update streak
     const today = fmt(new Date());
-    let newStreak = profile.streak;
+    let newStreak = currentStreak;
     let streakBonus = 0;
     if (profile.last_active !== today) {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       if (profile.last_active === fmt(yesterday)) {
-        newStreak = profile.streak + 1;
+        newStreak = currentStreak + 1;
         if (newStreak % 5 === 0) streakBonus = 20;
       } else {
         newStreak = 1;
@@ -103,8 +122,8 @@ export function useNemoData(): NemoData {
     const totalBonus = actualCoins + streakBonus;
 
     await updateProfile({
-      coins: profile.coins + totalBonus,
-      total_earned: profile.total_earned + totalBonus,
+      coins: currentCoins + totalBonus,
+      total_earned: currentTotalEarned + totalBonus,
       streak: newStreak,
       last_active: today,
     });
@@ -117,8 +136,8 @@ export function useNemoData(): NemoData {
       { id: 'tasks50', condition: completedCount >= 50 },
       { id: 'streak5', condition: newStreak >= 5 },
       { id: 'streak30', condition: newStreak >= 30 },
-      { id: 'coins100', condition: (profile.coins + totalBonus) >= 100 },
-      { id: 'coins_earned_200', condition: (profile.total_earned + totalBonus) >= 200 },
+      { id: 'coins100', condition: (currentCoins + totalBonus) >= 100 },
+      { id: 'coins_earned_200', condition: (currentTotalEarned + totalBonus) >= 200 },
     ];
 
     // Check stage completion
@@ -136,12 +155,13 @@ export function useNemoData(): NemoData {
       }
     }
 
-    await fetchAll();
+    await fetchAll(false);
   }, [user, profile, tasks, userBadges, userItems, updateProfile, fetchAll]);
 
   const purchaseItem = useCallback(async (itemId: string, price: number) => {
     if (!user || !profile) return;
-    if (profile.coins < price) return;
+    const currentCoins = Number(profile.coins ?? 0);
+    if (currentCoins < price) return;
 
     const { error: itemInsertError } = await supabase
       .from('user_items')
@@ -154,7 +174,7 @@ export function useNemoData(): NemoData {
     const { data: updatedProfile, error: profileUpdateError } = await supabase
       .from('profiles')
       .update({
-        coins: profile.coins - price,
+        coins: currentCoins - price,
         equipped_item: itemId,
       })
       .eq('user_id', user.id)
@@ -175,7 +195,7 @@ export function useNemoData(): NemoData {
       await supabase.from('user_badges').insert({ user_id: user.id, badge_id: 'shopper' });
     }
 
-    await fetchAll();
+    await fetchAll(false);
   }, [user, profile, userBadges, fetchAll]);
 
   const equipItem = useCallback(async (itemId: string | null) => {
@@ -258,7 +278,7 @@ export function useNemoData(): NemoData {
       await supabase.from('tasks').insert(taskInserts.slice(i, i + 50));
     }
 
-    await fetchAll();
+    await fetchAll(false);
   }, [user, updateProfile, fetchAll]);
 
   const resetPlan = useCallback(async () => {
@@ -270,12 +290,12 @@ export function useNemoData(): NemoData {
       coins: 0, total_earned: 0, streak: 0, last_active: null,
       equipped_item: null, onboarding_complete: false, current_stage: 'Foundations',
     });
-    await fetchAll();
+    await fetchAll(false);
   }, [user, updateProfile, fetchAll]);
 
   return {
     profile, tasks, badges, userBadges, shopItems, userItems, loading,
-    refetch: fetchAll, updateProfile, completeTask, purchaseItem, equipItem,
+    refetch: () => fetchAll(false), updateProfile, completeTask, purchaseItem, equipItem,
     generatePlan, resetPlan,
   };
 }

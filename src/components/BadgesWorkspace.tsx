@@ -60,11 +60,11 @@ const getBadgeProgress = (
     case 'stage_coredsa':
       return stageProgress(tasks, 'Core DSA');
     case 'coins100':
-      return { current: Math.min(profile.coins, 100), target: 100 };
+      return { current: Math.min(Number(profile.coins ?? 0), 100), target: 100 };
     case 'shopper':
       return { current: Math.min(userItems.length, 1), target: 1 };
     case 'coins_earned_200':
-      return { current: Math.min(profile.total_earned, 200), target: 200 };
+      return { current: Math.min(Number(profile.total_earned ?? 0), 200), target: 200 };
     default:
       return { current: 0, target: 1 };
   }
@@ -72,12 +72,18 @@ const getBadgeProgress = (
 
 const BadgesWorkspace: React.FC<BadgesWorkspaceProps> = ({ badges, userBadges, profile, tasks, userItems }) => {
   const earned = new Set(userBadges.map(b => b.badge_id));
+  // List of SVGs from public folder
+  const badgeSvgs = [
+    '/cal.svg', '/tasks.svg', '/shop.svg','/badges.svg', '/profile.svg', '/placeholder.svg'
+  ];
+  // Helper to pick random SVG for each badge
+  const getRandomSvg = (idx: number) => badgeSvgs[idx % badgeSvgs.length];
 
   return (
     <div>
-      <div className="font-pixel text-[10px] text-foreground mb-[18px] pb-[10px] border-b-2 border-border">🏆 BADGES</div>
+      <div className="font-pixel text-[10px] text-foreground mb-[18px] pb-[10px] border-b-2 border-border">BADGES</div>
       <div className="space-y-[10px]">
-        {badges.map(b => {
+        {badges.map((b, idx) => {
           const unlocked = earned.has(b.id);
           const progress = getBadgeProgress(b.id, tasks, profile, userItems);
           const pct = unlocked ? 100 : Math.round((progress.current / progress.target) * 100);
@@ -85,7 +91,12 @@ const BadgesWorkspace: React.FC<BadgesWorkspaceProps> = ({ badges, userBadges, p
           return (
             <div key={b.id} className={`bg-surface border-[1.5px] p-[14px] ${unlocked ? 'border-coin' : 'border-border'}`}>
               <div className="flex gap-[12px] items-start">
-                <span className={`text-[28px] leading-none ${unlocked ? '' : 'grayscale opacity-35'}`}>{b.icon}</span>
+                <img
+                  src={getRandomSvg(idx)}
+                  alt="badge icon"
+                  className={`w-[28px] h-[28px] ${unlocked ? '' : 'grayscale opacity-35'}`}
+                  style={{ imageRendering: 'pixelated' }}
+                />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-[8px] mb-[4px]">
                     <div className="font-pixel text-[6px] leading-[1.5]">{currencyWordToGems(b.name)}</div>

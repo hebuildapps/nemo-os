@@ -28,6 +28,7 @@ const Index: React.FC = () => {
   const [workspace, setWorkspace] = useState<WorkspaceId>('calendar');
   const [mcqTaskId, setMcqTaskId] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [insufficientGems, setInsufficientGems] = useState<{ need: number; have: number } | null>(null);
 
   const handleComplete = useCallback((id: string) => {
     const task = nemo.tasks.find(t => t.id === id);
@@ -53,8 +54,9 @@ const Index: React.FC = () => {
 
   const handleShopBuy = useCallback((id: string, price: number) => {
     if (!nemo.profile) return;
-    if (nemo.profile.coins < price) {
-      toast(`Not enough gems! Need ${price}, have ${nemo.profile.coins}`);
+    const currentGems = Number(nemo.profile.coins ?? 0);
+    if (currentGems < price) {
+      setInsufficientGems({ need: price, have: currentGems });
       return;
     }
     nemo
@@ -92,7 +94,7 @@ const Index: React.FC = () => {
   }, [nemo]);
 
   // Loading state
-  if (authLoading || (user && nemo.loading)) {
+  if (authLoading || (user && nemo.loading && !nemo.profile)) {
     return (
       <FramedViewport>
         <div className="flex h-full w-full items-center justify-center bg-background">
@@ -145,13 +147,13 @@ const Index: React.FC = () => {
 
         {/* Center: Workspace */}
         <main className="flex-1 h-full min-w-0  bg-[#cec8b8] overflow-y-auto px-[24px] py-[18px] max-md:pb-[72px]">
-          {workspace === 'calendar' && (
-            <div className="h-full">
-              <CalendarWorkspace tasks={nemo.tasks} onComplete={handleComplete} />
-            </div>
-          )}
-          {workspace === 'tasks' && <TasksWorkspace tasks={nemo.tasks} onComplete={handleComplete} />}
-          {workspace === 'badges' && (
+          <div className={workspace === 'calendar' ? 'h-full' : 'hidden h-full'}>
+            <CalendarWorkspace tasks={nemo.tasks} onComplete={handleComplete} />
+          </div>
+          <div className={workspace === 'tasks' ? 'block' : 'hidden'}>
+            <TasksWorkspace tasks={nemo.tasks} onComplete={handleComplete} />
+          </div>
+          <div className={workspace === 'badges' ? 'block' : 'hidden'}>
             <BadgesWorkspace
               badges={nemo.badges}
               userBadges={nemo.userBadges}
@@ -159,8 +161,8 @@ const Index: React.FC = () => {
               tasks={nemo.tasks}
               userItems={nemo.userItems}
             />
-          )}
-          {workspace === 'shop' && (
+          </div>
+          <div className={workspace === 'shop' ? 'block' : 'hidden'}>
             <ShopWorkspace
               profile={nemo.profile}
               shopItems={nemo.shopItems}
@@ -168,10 +170,10 @@ const Index: React.FC = () => {
               onBuy={handleShopBuy}
               onEquip={handleEquip}
             />
-          )}
-          {workspace === 'profile' && (
+          </div>
+          <div className={workspace === 'profile' ? 'block' : 'hidden'}>
             <ProfileWorkspace profile={nemo.profile} tasks={nemo.tasks} onReset={() => setShowConfirm(true)} />
-          )}
+          </div>
         </main>
 
         {/* Right: Icon Rail */}
@@ -194,6 +196,33 @@ const Index: React.FC = () => {
                 <button onClick={() => setShowConfirm(false)} className="font-pixel text-[7px] p-[9px_14px] bg-transparent text-muted-foreground border-[1.5px] border-border cursor-pointer flex-1">CANCEL</button>
                 <button onClick={confirmReset} className="font-pixel text-[7px] p-[9px_14px] bg-nemo-red text-primary-foreground border-none cursor-pointer flex-1">RESET EVERYTHING</button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Insufficient Gems Modal */}
+        {insufficientGems && (
+          <div className="fixed inset-0 bg-foreground/70 flex items-center justify-center z-[210]">
+            <div className="bg-surface border-2 border-border p-[24px] w-[360px] max-w-[95vw]">
+              <div className="font-pixel text-[9px] text-foreground mb-[10px]">INSUFFICIENT GEMS</div>
+              <div className="text-[12px] text-muted-foreground leading-[1.6] mb-[14px]">
+                You need {insufficientGems.need} gems but currently have {insufficientGems.have}.
+              </div>
+              <div className="flex items-center gap-[8px] mb-[16px]">
+                <img
+                  src="/diamond.png"
+                  alt="gems"
+                  className="w-[18px] h-[18px] shrink-0"
+                  style={{ imageRendering: 'pixelated' }}
+                />
+                <span className="font-pixel text-[8px] text-coin">EARN MORE GEMS BY COMPLETING TASKS</span>
+              </div>
+              <button
+                onClick={() => setInsufficientGems(null)}
+                className="font-pixel text-[7px] p-[9px_14px] bg-transparent text-foreground border-[1.5px] border-border cursor-pointer w-full"
+              >
+                OK
+              </button>
             </div>
           </div>
         )}

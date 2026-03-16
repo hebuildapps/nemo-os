@@ -6,12 +6,14 @@ interface IconRailProps {
   onSwitch: (ws: WorkspaceId) => void;
 }
 
-const ITEMS: { id: WorkspaceId; ico: string; label: string }[] = [
-  { id: 'calendar', ico: '🗓️', label: 'CAL' },
-  { id: 'tasks', ico: '🧾', label: 'TASKS' },
-  { id: 'badges', ico: '🏅', label: 'BADGES' },
-  { id: 'shop', ico: '🛍️', label: 'SHOP' },
-  { id: 'profile', ico: '🙂', label: 'PROFILE' },
+type NavItem = { id: WorkspaceId; img?: string; ico?: string; label: string };
+
+const ITEMS: NavItem[] = [
+  { id: 'calendar', img: '/cal.svg',     label: 'CAL'     },
+  { id: 'tasks',    img: '/tasks.svg',   label: 'TASKS'   },
+  { id: 'badges',   img: '/badges.svg',  label: 'BADGES' },
+  { id: 'shop',     img: '/shop.svg',    label: 'SHOP'    },
+  { id: 'profile',  img: '/profile.svg', label: 'PROFILE' },
 ];
 
 const IconRail: React.FC<IconRailProps> = ({ active, onSwitch }) => (
@@ -24,12 +26,28 @@ const IconRail: React.FC<IconRailProps> = ({ active, onSwitch }) => (
         className={`w-[52px] h-[56px] flex flex-col items-center justify-center gap-[5px] cursor-pointer border transition-all
           max-md:flex-1 max-md:h-full max-md:w-auto
           ${active === item.id
-            ? 'bg-[#1f1f1f] border-[#1f1f1f] text-[#f4f4f4]'
-            : 'border-transparent text-muted-foreground hover:bg-surface2/80 hover:text-foreground'
+            ? 'bg-[#1f1f1f] border-[#1f1f1f]'
+            : 'border-transparent hover:bg-surface2/80'
           }`}
       >
-        <span className="text-[15px] leading-none">{item.ico}</span>
-        <span className="font-pixel text-[6px] text-center leading-none">{item.label}</span>
+        {item.img ? (
+          <img
+            src={item.img}
+            alt={item.label}
+            className={
+              item.id === 'tasks' ? 'w-[16px] h-[28px] shrink-0' :
+              item.id === 'profile' ? 'w-[22px] h-[32px] shrink-0' :
+              'w-[22px] h-[22px] shrink-0'
+            }
+          />
+        ) : null}
+        <span
+          className={`font-pixel text-[6px] text-center leading-none ${
+            active === item.id ? 'text-[#f4f4f4]' : 'text-muted-foreground'
+          }`}
+        >
+          {item.label}
+        </span>
       </button>
     ))}
   </nav>

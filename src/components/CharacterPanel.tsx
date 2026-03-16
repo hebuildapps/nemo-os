@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { TIERS } from '@/lib/nemo-data';
+import React, { useEffect, useState } from 'react';
 import type { Database } from '@/integrations/supabase/types';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -49,7 +48,6 @@ const companionImageCandidates = (itemId: string) => [
 
 const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
   const today = toLocalIsoDate(new Date());
-  const todayUtc = new Date().toISOString().split('T')[0];
   const start = parseDateOnly(profile.created_at);
   const end = parseDateOnly(profile.placement_date);
   const now = parseDateOnly(today);
@@ -58,7 +56,6 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
   const progressPct = Math.min(100, Math.round((elapsed / total) * 100));
 
   const done = tasks.filter(t => t.completed).length;
-  const completedToday = tasks.filter(t => t.completed && (t.date === today || t.date === todayUtc)).length;
   const totalTaskCount = tasks.length;
   const completedTaskCount = done;
   const taskCompletionPct = totalTaskCount > 0 ? Math.round((completedTaskCount / totalTaskCount) * 100) : 0;
@@ -66,6 +63,13 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
   const gender = profile.gender?.toLowerCase() === 'girl' ? 'girl' : 'boy';
   const characterSrc = `/${gender}_${mood}.png`;
   const equippedImageCandidates = profile.equipped_item ? companionImageCandidates(profile.equipped_item) : [];
+  const displayName = (profile.name || 'NEMO').replace(/[.]+$/g, '').trim();
+
+  // Sentiment text
+  let sentimentText = `${displayName} is prepping`;
+  if (mood === 'sad') sentimentText = `${displayName} is losing motivation`;
+  else if (mood === 'neutral') sentimentText = `${displayName} is prepping`;
+  else if (mood === 'happy') sentimentText = `${displayName} is winning`;
 
   const [displaySrc, setDisplaySrc] = useState(characterSrc);
   const [isVisible, setIsVisible] = useState(true);
@@ -81,31 +85,11 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
     return () => window.clearTimeout(timer);
   }, [characterSrc, displaySrc]);
 
-  const characterBackdropStyle = useMemo<React.CSSProperties>(() => {
-    if (completedToday > 7) {
-      return {
-        background: 'linear-gradient(90deg, #ff4f6d 0%, #ffb347 25%, #fff275 45%, #62d9a0 65%, #5ec2ff 85%, #c28fff 100%)',
-        opacity: 0.95,
-        boxShadow: '0 0 0 1px rgba(255,255,255,0.25), 0 10px 22px rgba(0,0,0,0.28)',
-      };
-    }
-    if (completedToday >= 2) {
-      return { background: '#D4AF37', opacity: 0.86, boxShadow: '0 0 0 1px rgba(127,95,31,0.8), 0 8px 20px rgba(212,175,55,0.3)' };
-    }
-    if (completedToday === 1) {
-      return { background: '#C0C0C0', opacity: 0.82, boxShadow: '0 0 0 1px rgba(120,120,120,0.7), 0 8px 20px rgba(192,192,192,0.28)' };
-    }
-    return { background: '#9a9a9a', opacity: 0.22, boxShadow: '0 0 0 1px rgba(255,255,255,0.08)' };
-  }, [completedToday]);
-
-  const stoneThresh = [5, 15, 30, 50];
-  const tierIdx = Math.min(TIERS.length - 1, Math.floor(done / 10));
-
   return (
     <aside className="relative w-[260px] min-w-[260px] h-full bg-background border-r border-border/70 flex flex-col items-center justify-center px-[18px] py-[20px] gap-[12px] overflow-hidden">
       <div className={`w-full flex flex-col items-center gap-[12px] transition-opacity duration-200 ${showGuide ? 'opacity-70' : 'opacity-100'}`}>
         <div className="flex items-center justify-center gap-[6px]">
-          <div className="font-pixel text-[7px] text-muted-foreground/80 text-center tabular-nums">
+          <div className="font-pixel font-bold text-[8px] text-black text-center tabular-nums">
             {elapsed} / {total} days
           </div>
           <button
@@ -128,7 +112,6 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
 
         <div className="my-[8px] py-[10px] flex items-center justify-center">
           <div className="relative w-[150px] h-[172px]">
-            <div className="absolute -inset-[6px] rounded-[10px] transition-all duration-300" style={characterBackdropStyle} />
             <img
               src={displaySrc}
               alt={`${gender} character ${mood}`}
@@ -143,7 +126,7 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
               <img
                 src={equippedImageCandidates[0]}
                 alt={profile.equipped_item}
-                className="absolute bottom-0 right-0 z-[2] w-[40px] h-[40px]"
+                className="absolute z-[2] w-[64px] h-[64px] top-[75%] right-[25%] -translate-x-1/2 -translate-y-1/2"
                 data-fallback-step="0"
                 onError={(event) => {
                   const currentStep = Number(event.currentTarget.dataset.fallbackStep || '0');
@@ -163,24 +146,11 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
           </div>
         </div>
 
-        <div className="text-[11px] text-muted-foreground/70 text-center leading-[1.8] italic">
-          {profile.name} is prepping.
+        <div className="text-[11px] text-black text-center leading-[1.8] italic">
+          {sentimentText}
         </div>
 
-        {/* Stones (Phase 2) */}
-        <div className="flex gap-[6px] justify-center mt-[2px]">
-          {stoneThresh.map((th, i) => {
-            let cls = 'w-[16px] h-[16px] border transition-all';
-            if (done >= th) cls += ' bg-coin/80 border-coin/70';
-            else if (done >= th * 0.5) cls += ' bg-coin/40 border-coin/45';
-            else cls += ' bg-border/70 border-border/80';
-            return <div key={i} className={cls} />;
-          })}
-        </div>
-
-        <div className="font-pixel text-[6px] px-[8px] py-[3px] border border-border/70 text-muted-foreground/80 bg-transparent">
-          {TIERS[tierIdx]}
-        </div>
+        {/* Remove stones and tier display */}
 
         <div
           className="mt-[2px] inline-flex items-center gap-[6px] px-[8px] py-[4px] border border-border/80 bg-surface2/70 rounded-[4px]"
@@ -193,7 +163,7 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
             style={{ imageRendering: 'pixelated' }}
           />
           <span className="font-pixel text-[7px] text-coin tabular-nums">
-            {compactGems(profile.coins)} GEMS
+            {compactGems(profile.coins ?? 0)} GEMS
           </span>
         </div>
       </div>
@@ -231,13 +201,10 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
                 </div>
               ))}
             </div>
-
             <div className="text-[10px] leading-[1.5] text-muted-foreground">
               Complete tasks to improve mood and unlock a brighter character state.
             </div>
-            <div className="mt-[6px] text-[9px] leading-[1.5] text-muted-foreground/90">
-              Background bonus: 1 task today = silver, 2+ tasks = gold, 8+ tasks = rainbow.
-            </div>
+            {/* Removed background bonus text */}
           </div>
         </div>
       )}
