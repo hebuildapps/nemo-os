@@ -34,7 +34,7 @@ const ShopWorkspace: React.FC<ShopWorkspaceProps> = ({ profile, shopItems, userI
   return (
     <div>
       <div className="space-y-[12px]">
-        <div className="font-pixel text-[10px] text-foreground mb-[18px] pb-[10px] border-b-2 border-border flex items-center gap-2">
+        <div className="font-pixel text-[10px] mb-[18px] pb-[10px] bg-[#152337] text-[#f9d362] border-b-2 border-border p-2 flex items-center gap-2">
           <img src="/shop.svg" alt="shop" className="w-[22px] h-[22px]" /> SHOP
         </div>
         <div className="flex items-center gap-[10px] mb-[18px] p-[10px_14px] bg-surface border-[1.5px] border-border">

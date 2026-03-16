@@ -34,7 +34,9 @@ const TasksWorkspace: React.FC<TasksWorkspaceProps> = ({ tasks, onComplete }) =>
 
   return (
     <div>
-      <div className="font-pixel text-[10px] text-foreground mb-[18px] pb-[10px] border-b-2 border-border">📋 TASKS</div>
+      <div className="font-pixel text-[10px] bg-[#152337] flex items-center gap-2 text-[#f9d362] p-2 mb-[18px] pb-[10px] border-b-2 border-border"> 
+        <img src="/tasks.svg" alt="tasks" className="w-[20px] h-[20px]" /> TASKS
+      </div>
 
       <div className="flex gap-[5px] mb-[14px] flex-wrap">
         {FILTERS.map(f => (

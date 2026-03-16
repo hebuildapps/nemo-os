@@ -95,7 +95,7 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
           <button
             type="button"
             onClick={() => setShowGuide(true)}
-            className="font-pixel text-[7px] w-[14px] h-[14px] border border-border/80 text-muted-foreground/90 rounded-full flex items-center justify-center leading-none"
+            className="font-pixel text-[7px] w-[14px] h-[14px] border border-border/80 text-[#454545] rounded-full flex items-center justify-center leading-none"
             aria-label="Open character status guide"
           >
             ?

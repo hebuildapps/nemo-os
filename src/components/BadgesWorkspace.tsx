@@ -81,7 +81,9 @@ const BadgesWorkspace: React.FC<BadgesWorkspaceProps> = ({ badges, userBadges, p
 
   return (
     <div>
-      <div className="font-pixel text-[10px] text-foreground mb-[18px] pb-[10px] border-b-2 border-border">BADGES</div>
+      <div className="font-pixel text-[10px] bg-[#152337] text-[#f9d362] mb-[18px] pb-[10px] border-b-2 border-border flex items-center p-2 gap-2">
+        <img src="/badges.svg" alt="badges" className="w-[22px] h-[22px]" /> BADGES
+      </div>
       <div className="space-y-[10px]">
         {badges.map((b, idx) => {
           const unlocked = earned.has(b.id);
