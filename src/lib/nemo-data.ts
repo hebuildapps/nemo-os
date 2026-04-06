@@ -56,6 +56,7 @@ export const STAGE_WEIGHTS = [0.15, 0.25, 0.20, 0.20, 0.20];
 
 export const TIERS = ['IRON', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'DIAMOND', 'ASCENDANT', 'IMMORTAL', 'RADIANT'];
 
+// Fallback-only task templates used when AI roadmap generation is unavailable.
 export const TASK_TEMPLATES: Record<string, { t: string; d: string; diff: Difficulty }[]> = {
   foundations: [
     { t: 'Big-O Notation Basics', d: 'Study time and space complexity. Practice identifying O(n), O(n²), O(log n) patterns.', diff: 'easy' },

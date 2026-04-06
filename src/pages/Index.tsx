@@ -11,6 +11,7 @@ import ShopWorkspace from '@/components/ShopWorkspace';
 import ProfileWorkspace from '@/components/ProfileWorkspace';
 import Onboarding from '@/components/Onboarding';
 import AuthPage from '@/components/AuthPage';
+import AlphaGatePage from '@/components/AlphaGatePage';
 import McqModal from '@/components/McqModal';
 import { toast } from 'sonner';
 
@@ -23,6 +24,7 @@ const FramedViewport: React.FC<{ children: React.ReactNode }> = ({ children }) =
 );
 
 const Index: React.FC = () => {
+  const isAlphaLockEnabled = (import.meta.env.VITE_ALPHA_LOCK_ENABLED ?? 'false') === 'true';
   const { user, loading: authLoading } = useAuth();
   const nemo = useNemoData();
   const [workspace, setWorkspace] = useState<WorkspaceId>('calendar');
@@ -69,8 +71,8 @@ const Index: React.FC = () => {
     nemo.equipItem(id);
   }, [nemo]);
 
-  const handleOnboard = useCallback(async (gender: 'boy' | 'girl', name: string, date: string, role: string, hours: number, ref: string) => {
-    await nemo.generatePlan(date, role, hours, name, gender, ref || undefined);
+  const handleOnboard = useCallback(async (gender: 'boy' | 'girl', name: string, date: string, goal: string, ref: string) => {
+    await nemo.generatePlan(date, goal, name, gender, ref || undefined);
     if (ref) {
       toast(
         <span className="inline-flex items-center gap-1">
@@ -108,7 +110,7 @@ const Index: React.FC = () => {
   if (!user) {
     return (
       <FramedViewport>
-        <AuthPage />
+        {isAlphaLockEnabled ? <AlphaGatePage /> : <AuthPage />}
       </FramedViewport>
     );
   }

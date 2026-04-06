@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { fmt } from '@/lib/nemo-data';
 
 interface OnboardingProps {
-  onComplete: (gender: 'boy' | 'girl', name: string, date: string, role: string, hours: number, ref: string) => Promise<void>;
+  onComplete: (gender: 'boy' | 'girl', name: string, date: string, goal: string, ref: string) => Promise<void>;
 }
 
 const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
@@ -11,8 +11,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
   const [name, setName] = useState('');
   const [date, setDate] = useState(fmt(defaultDate));
-  const [role, setRole] = useState('');
-  const [hours, setHours] = useState('4');
+  const [goal, setGoal] = useState('');
   const [ref, setRef] = useState('');
   const [gender, setGender] = useState<'boy' | 'girl' | null>(null);
   const [step, setStep] = useState<1 | 2>(1);
@@ -28,16 +27,35 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const submit = async () => {
     if (!gender) { setError('Please select BOY or GIRL!'); return; }
     if (!date) { setError('Please set your placement date!'); return; }
-    if (!role) { setError('Please select a target role!'); return; }
+    if (!goal.trim()) { setError('Please tell us what you are preparing for!'); return; }
     if (new Date(date) <= new Date()) { setError('Placement date must be in the future!'); return; }
     setLoading(true);
+    setError('');
     try {
-      await onComplete(gender, name.trim() || 'NEMO', date, role, parseInt(hours, 10), ref.trim().toUpperCase());
+      await onComplete(gender, name.trim() || 'NEMO', date, goal.trim(), ref.trim().toUpperCase());
     } catch (e: any) {
       setError(e.message || 'Something went wrong');
     }
     setLoading(false);
   };
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 z-[260] flex items-center justify-center bg-background">
+        <style>{`@keyframes nemo-blink-cursor { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }`}</style>
+        <div className="font-pixel text-[13px] tracking-[1px] text-foreground text-center">
+          GENERATING YOUR ROADMAP...
+          <span
+            className="inline-block ml-[4px]"
+            style={{ animation: 'nemo-blink-cursor 1s steps(1, end) infinite' }}
+            aria-hidden="true"
+          >
+            |
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex items-center justify-center bg-background">
@@ -95,27 +113,14 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               className="w-full p-[9px_11px] border-[1.5px] border-border bg-surface2 font-mono text-[12px] mb-[14px] text-foreground outline-none focus:border-primary"
             />
 
-            <label className="font-pixel text-[7px] text-muted-foreground block mb-[5px]">TARGET ROLE</label>
-            <select
-              value={role} onChange={e => setRole(e.target.value)}
+            <label className="font-pixel text-[7px] text-muted-foreground block mb-[5px]">WHAT ARE YOU PREPARING FOR?</label>
+            <input
+              value={goal}
+              onChange={e => setGoal(e.target.value)}
+              maxLength={120}
+              placeholder="e.g. Software Engineering placements, UPSC, CAT, Data Science internship"
               className="w-full p-[9px_11px] border-[1.5px] border-border bg-surface2 font-mono text-[12px] mb-[14px] text-foreground outline-none focus:border-primary"
-            >
-              <option value="">Select role...</option>
-              <option value="Software Engineer">Software Engineer</option>
-              <option value="Frontend Developer">Frontend Developer</option>
-              <option value="Backend Developer">Backend Developer</option>
-              <option value="Full Stack Developer">Full Stack Developer</option>
-            </select>
-
-            <label className="font-pixel text-[7px] text-muted-foreground block mb-[5px]">STUDY HOURS / DAY</label>
-            <select
-              value={hours} onChange={e => setHours(e.target.value)}
-              className="w-full p-[9px_11px] border-[1.5px] border-border bg-surface2 font-mono text-[12px] mb-[14px] text-foreground outline-none focus:border-primary"
-            >
-              {[2, 3, 4, 5, 6, 8].map(h => (
-                <option key={h} value={h}>{h} hours</option>
-              ))}
-            </select>
+            />
 
             <label className="font-pixel text-[7px] text-muted-foreground block mb-[5px]">REFERRAL CODE (optional)</label>
             <input
@@ -136,9 +141,18 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 disabled={loading}
                 className="font-pixel text-[9px] p-[13px] flex-1 bg-primary text-primary-foreground border-none cursor-pointer transition-opacity hover:opacity-85 disabled:opacity-50"
               >
-                {loading ? 'GENERATING PLAN...' : 'INITIALIZE NEMO OS →'}
+                INITIALIZE NEMO OS →
               </button>
             </div>
+
+            {error && (
+              <button
+                onClick={submit}
+                className="font-pixel text-[8px] p-[11px] w-full bg-transparent text-primary border-[1.5px] border-primary cursor-pointer mt-[8px]"
+              >
+                RETRY GENERATION
+              </button>
+            )}
           </>
         )}
       </div>

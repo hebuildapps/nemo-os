@@ -76,7 +76,7 @@ const BadgesWorkspace: React.FC<BadgesWorkspaceProps> = ({ badges, userBadges, p
   const earned = new Set(userBadges.map(b => b.badge_id));
   // List of SVGs from public folder
   const badgeSvgs = [
-    '/cal.svg', '/tasks.svg', '/shop.svg','/badges.svg', '/profile.svg', '/placeholder.svg'
+    '/cal.svg', '/badges/fire.svg', '/shop.svg', '/badges.svg', '/profile.svg', 'badges/grow.svg'
   ];
   // Helper to pick random SVG for each badge
   const getRandomSvg = (idx: number) => badgeSvgs[idx % badgeSvgs.length];
@@ -98,7 +98,7 @@ const BadgesWorkspace: React.FC<BadgesWorkspaceProps> = ({ badges, userBadges, p
                 <img
                   src={getRandomSvg(idx)}
                   alt="badge icon"
-                  className={`w-[28px] h-[28px] ${unlocked ? '' : 'grayscale opacity-35'}`}
+                  className={`w-[28px] h-[28px] ${unlocked ? '' : 'grayscale opacity-50'}`}
                   style={{ imageRendering: 'pixelated' }}
                 />
                 <div className="flex-1 min-w-0">

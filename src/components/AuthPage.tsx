@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Eye, EyeOff } from 'lucide-react';
 
 const AuthPage: React.FC = () => {
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, signInWithGoogle } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,6 +29,17 @@ const AuthPage: React.FC = () => {
       if (error) setError(error);
     }
     setLoading(false);
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setSuccess('');
+    setLoading(true);
+    const { error } = await signInWithGoogle();
+    if (error) {
+      setError(error);
+      setLoading(false);
+    }
   };
 
   return (
@@ -89,6 +100,14 @@ const AuthPage: React.FC = () => {
           className="font-pixel text-[9px] p-[13px] w-full bg-primary text-primary-foreground border-none cursor-pointer mt-[6px] transition-opacity hover:opacity-85 disabled:opacity-50"
         >
           {loading ? 'PROCESSING...' : isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}
+        </button>
+
+        <button
+          onClick={handleGoogleSignIn}
+          disabled={loading}
+          className="font-pixel text-[8px] p-[12px] w-full bg-transparent text-foreground border-[1.5px] border-border cursor-pointer mt-[7px] hover:border-primary hover:text-primary transition-colors disabled:opacity-50"
+        >
+          CONTINUE WITH GOOGLE
         </button>
 
         <button

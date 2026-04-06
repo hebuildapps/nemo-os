@@ -6,6 +6,7 @@ import type { Database } from '@/integrations/supabase/types';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type TaskRow = Database['public']['Tables']['tasks']['Row'];
+type TaskInsert = Database['public']['Tables']['tasks']['Insert'];
 type BadgeRow = Database['public']['Tables']['badges']['Row'];
 type UserBadgeRow = Database['public']['Tables']['user_badges']['Row'];
 type ShopItemRow = Database['public']['Tables']['shop_items']['Row'];
@@ -30,13 +31,221 @@ export interface NemoData {
   completeTask: (taskId: string, mcqVerified: boolean) => Promise<void>;
   purchaseItem: (itemId: string, price: number) => Promise<void>;
   equipItem: (itemId: string | null) => Promise<void>;
-  generatePlan: (placementDate: string, targetRole: string, hoursPerDay: number, name: string, gender: 'boy' | 'girl', referredBy?: string) => Promise<void>;
+  generatePlan: (placementDate: string, goal: string, name: string, gender: 'boy' | 'girl', referredBy?: string) => Promise<void>;
   resetPlan: () => Promise<void>;
+}
+
+type DifficultyValue = 'easy' | 'medium' | 'hard';
+
+interface GeneratedPlanTask {
+  title: string;
+  description: string;
+  difficulty: DifficultyValue;
+}
+
+interface GeneratedPlanStage {
+  id: number;
+  name: string;
+  days: number;
+  tasks: GeneratedPlanTask[];
+}
+
+interface GeneratedPlanResponse {
+  stages: GeneratedPlanStage[];
 }
 
 function fmt(d: Date): string {
   return d.toISOString().split('T')[0];
 }
+
+const backendBaseUrl = import.meta.env.VITE_BACKEND_URL?.replace(/\/+$/, '');
+const GENERATE_PLAN_ENDPOINT = backendBaseUrl ? `${backendBaseUrl}/api/generate-plan` : '/api/generate-plan';
+
+const isValidDifficulty = (value: unknown): value is DifficultyValue =>
+  value === 'easy' || value === 'medium' || value === 'hard';
+
+const stageKeyFromName = (name: string): string => {
+  const key = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  return key || 'stage';
+};
+
+const buildFallbackTaskInserts = (userId: string, placementDate: string): TaskInsert[] => {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(placementDate);
+  end.setHours(0, 0, 0, 0);
+  const totalDays = Math.max(7, Math.round((end.getTime() - start.getTime()) / 864e5));
+
+  let prepDays = totalDays;
+  STAGE_BREAKS.forEach(b => (prepDays -= b));
+  prepDays = Math.max(5, prepDays);
+
+  const stageDaysArr = STAGE_WEIGHTS.map(w => Math.max(3, Math.round(w * prepDays)));
+  const cur = new Date(start);
+  const taskInserts: TaskInsert[] = [];
+
+  STAGES.forEach((stage, si) => {
+    const key = STAGE_KEYS[si];
+    const tpls = TASK_TEMPLATES[key] || [];
+    const days = stageDaysArr[si];
+
+    for (let d = 0; d < days; d++) {
+      const dt = new Date(cur);
+      const tpl = tpls[d % tpls.length];
+      taskInserts.push({
+        user_id: userId,
+        date: fmt(dt),
+        title: tpl.t,
+        description: tpl.d,
+        stage,
+        stage_key: key,
+        difficulty: tpl.diff,
+        is_break: false,
+        coins_reward: 5,
+        completed: false,
+        mcq_verified: false,
+      });
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    const bk = STAGE_BREAKS[si];
+    for (let b = 0; b < bk; b++) {
+      const dt = new Date(cur);
+      taskInserts.push({
+        user_id: userId,
+        date: fmt(dt),
+        title: 'BREAK DAY',
+        description: 'Rest, reflect, and recharge. Review weak areas or simply take a well-earned break.',
+        stage,
+        stage_key: 'break',
+        difficulty: 'easy',
+        is_break: true,
+        coins_reward: 1,
+        completed: false,
+        mcq_verified: false,
+      });
+      cur.setDate(cur.getDate() + 1);
+    }
+  });
+
+  return taskInserts;
+};
+
+const isValidGeneratedPlan = (value: unknown): value is GeneratedPlanResponse => {
+  if (!value || typeof value !== 'object') return false;
+
+  const candidate = value as Partial<GeneratedPlanResponse>;
+  if (!Array.isArray(candidate.stages) || candidate.stages.length !== 5) return false;
+
+  return candidate.stages.every((stage): stage is GeneratedPlanStage => {
+    if (!stage || typeof stage !== 'object') return false;
+    if (typeof stage.id !== 'number') return false;
+    if (typeof stage.name !== 'string' || !stage.name.trim()) return false;
+    if (typeof stage.days !== 'number' || !Number.isFinite(stage.days) || stage.days < 1) return false;
+    if (!Array.isArray(stage.tasks) || stage.tasks.length !== 5) return false;
+
+    return stage.tasks.every(task => (
+      task &&
+      typeof task.title === 'string' &&
+      !!task.title.trim() &&
+      typeof task.description === 'string' &&
+      !!task.description.trim() &&
+      isValidDifficulty(task.difficulty)
+    ));
+  });
+};
+
+const fetchGeneratedPlan = async (goal: string, daysAvailable: number): Promise<GeneratedPlanResponse | null> => {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const response = await fetch(GENERATE_PLAN_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        goal,
+        days_available: daysAvailable,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const payload: unknown = await response.json();
+    if (!isValidGeneratedPlan(payload)) {
+      return null;
+    }
+
+    return payload;
+  } catch {
+    return null;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+};
+
+const buildGeneratedTaskInserts = (userId: string, stages: GeneratedPlanStage[]): TaskInsert[] => {
+  const cur = new Date();
+  cur.setHours(0, 0, 0, 0);
+
+  const taskInserts: TaskInsert[] = [];
+
+  stages.forEach((stage, stageIndex) => {
+    const stageName = stage.name.trim();
+    const stageKey = stageKeyFromName(stageName);
+    const stageDays = Math.max(1, Math.round(stage.days));
+
+    for (let day = 0; day < stageDays; day += 1) {
+      const dt = new Date(cur);
+      const template = stage.tasks[day % stage.tasks.length];
+
+      taskInserts.push({
+        user_id: userId,
+        date: fmt(dt),
+        title: template.title.trim(),
+        description: template.description.trim(),
+        stage: stageName,
+        stage_key: stageKey,
+        difficulty: template.difficulty,
+        is_break: false,
+        coins_reward: 5,
+        completed: false,
+        mcq_verified: false,
+      });
+
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    const breakDays = STAGE_BREAKS[stageIndex] ?? 0;
+    for (let breakIndex = 0; breakIndex < breakDays; breakIndex += 1) {
+      const dt = new Date(cur);
+      taskInserts.push({
+        user_id: userId,
+        date: fmt(dt),
+        title: 'BREAK DAY',
+        description: 'Rest, reflect, and recharge. Review weak areas or simply take a well-earned break.',
+        stage: stageName,
+        stage_key: 'break',
+        difficulty: 'easy',
+        is_break: true,
+        coins_reward: 1,
+        completed: false,
+        mcq_verified: false,
+      });
+      cur.setDate(cur.getDate() + 1);
+    }
+  });
+
+  return taskInserts;
+};
 
 const readGems = (value: Profile | null): number => {
   const candidate = value as ProfileWithGems | null;
@@ -316,17 +525,18 @@ export function useNemoData(): NemoData {
     await updateProfile({ equipped_item: itemId });
   }, [updateProfile]);
 
-  const generatePlan = useCallback(async (placementDate: string, targetRole: string, hoursPerDay: number, name: string, gender: 'boy' | 'girl', referredBy?: string) => {
+  const generatePlan = useCallback(async (placementDate: string, goal: string, name: string, gender: 'boy' | 'girl', referredBy?: string) => {
     if (!user) return;
 
     const startGems = referredBy ? 50 : 0;
+    const defaultHoursPerDay = 4;
 
     const baseProfilePayload = {
       user_id: user.id,
       name: name.toUpperCase(),
       placement_date: placementDate,
-      target_role: targetRole,
-      hours_per_day: hoursPerDay,
+      target_role: goal,
+      hours_per_day: defaultHoursPerDay,
       gender,
       referred_by: referredBy || null,
       onboarding_complete: true,
@@ -412,58 +622,16 @@ export function useNemoData(): NemoData {
       throw new Error(clearTasksError.message || 'Failed to reset existing tasks');
     }
 
-    // Generate tasks
-    const start = new Date(); start.setHours(0, 0, 0, 0);
-    const end = new Date(placementDate); end.setHours(0, 0, 0, 0);
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(placementDate);
+    end.setHours(0, 0, 0, 0);
     const totalDays = Math.max(7, Math.round((end.getTime() - start.getTime()) / 864e5));
 
-    let prepDays = totalDays;
-    STAGE_BREAKS.forEach(b => (prepDays -= b));
-    prepDays = Math.max(5, prepDays);
-
-    const stageDaysArr = STAGE_WEIGHTS.map(w => Math.max(3, Math.round(w * prepDays)));
-    const cur = new Date(start);
-    const taskInserts: any[] = [];
-
-    STAGES.forEach((stage, si) => {
-      const key = STAGE_KEYS[si];
-      const tpls = TASK_TEMPLATES[key] || [];
-      const days = stageDaysArr[si];
-
-      for (let d = 0; d < days; d++) {
-        const dt = new Date(cur);
-        const tpl = tpls[d % tpls.length];
-        taskInserts.push({
-          user_id: user.id,
-          date: fmt(dt),
-          title: tpl.t,
-          description: tpl.d,
-          stage,
-          stage_key: key,
-          difficulty: tpl.diff,
-          is_break: false,
-          coins_reward: 5,
-        });
-        cur.setDate(cur.getDate() + 1);
-      }
-
-      const bk = STAGE_BREAKS[si];
-      for (let b = 0; b < bk; b++) {
-        const dt = new Date(cur);
-        taskInserts.push({
-          user_id: user.id,
-          date: fmt(dt),
-          title: 'BREAK DAY',
-          description: 'Rest, reflect, and recharge. Review weak areas or simply take a well-earned break.',
-          stage,
-          stage_key: 'break',
-          difficulty: 'easy',
-          is_break: true,
-          coins_reward: 1,
-        });
-        cur.setDate(cur.getDate() + 1);
-      }
-    });
+    const generatedPlan = await fetchGeneratedPlan(goal, totalDays);
+    const taskInserts = generatedPlan
+      ? buildGeneratedTaskInserts(user.id, generatedPlan.stages)
+      : buildFallbackTaskInserts(user.id, placementDate);
 
     // Insert in batches of 50
     for (let i = 0; i < taskInserts.length; i += 50) {
