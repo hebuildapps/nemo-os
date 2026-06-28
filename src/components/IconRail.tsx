@@ -1,5 +1,6 @@
 import React from 'react';
 import { WorkspaceId } from '@/lib/nemo-data';
+import { NemoMascot } from '@/components/NemoMascot';
 
 interface IconRailProps {
   active: WorkspaceId;
@@ -31,15 +32,18 @@ const IconRail: React.FC<IconRailProps> = ({ active, onSwitch }) => (
           }`}
       >
         {item.img ? (
-          <img
-            src={item.img}
-            alt={item.label}
-            className={
-              item.id === 'tasks' ? 'w-[16px] h-[28px] shrink-0' :
-              item.id === 'profile' ? 'w-[22px] h-[32px] shrink-0' :
-              'w-[22px] h-[22px] shrink-0'
-            }
-          />
+          item.id === 'profile' ? (
+             <NemoMascot className="w-[22px] h-[32px] shrink-0" />
+          ) : (
+            <img
+              src={item.img}
+              alt={item.label}
+              className={
+                item.id === 'tasks' ? 'w-[16px] h-[28px] shrink-0' :
+                'w-[22px] h-[22px] shrink-0'
+              }
+            />
+          )
         ) : null}
         <span
           className={`font-pixel text-[6px] text-center leading-none ${

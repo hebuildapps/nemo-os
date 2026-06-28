@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SignOut, Trash } from '@phosphor-icons/react';
 import type { Database } from '@/integrations/supabase/types';
 import { useAuth } from '@/hooks/useAuth';
+import { NemoMascot } from '@/components/NemoMascot';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type TaskRow = Database['public']['Tables']['tasks']['Row'];
@@ -43,7 +44,7 @@ const ProfileWorkspace: React.FC<ProfileWorkspaceProps> = ({ profile, tasks, onR
   return (
     <div>
       <div className="font-pixel text-[10px] bg-[#152337] text-[#f9d362] p-2 mb-[18px] pb-[10px] border-b-2 border-border flex items-center gap-2">
-        <img src="/profile.svg" alt="profile" className="w-[22px] h-[32px]" /> PROFILE
+        <NemoMascot className="w-[22px] h-[32px]" /> PROFILE
       </div>
 
       <div className="bg-surface border-[1.5px] border-border p-[18px] mb-[14px]">

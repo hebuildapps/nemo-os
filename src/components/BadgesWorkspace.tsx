@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Database } from '@/integrations/supabase/types';
+import { NemoMascot } from '@/components/NemoMascot';
 
 type BadgeRow = Database['public']['Tables']['badges']['Row'];
 type UserBadgeRow = Database['public']['Tables']['user_badges']['Row'];
@@ -95,12 +96,18 @@ const BadgesWorkspace: React.FC<BadgesWorkspaceProps> = ({ badges, userBadges, p
           return (
             <div key={b.id} className={`bg-surface border-[1.5px] p-[14px] ${unlocked ? 'border-coin' : 'border-border'}`}>
               <div className="flex gap-[12px] items-start">
-                <img
-                  src={getRandomSvg(idx)}
-                  alt="badge icon"
-                  className={`w-[28px] h-[28px] ${unlocked ? '' : 'grayscale opacity-50'}`}
-                  style={{ imageRendering: 'pixelated' }}
-                />
+                {getRandomSvg(idx) === '/profile.svg' ? (
+                  <NemoMascot
+                    className={`w-[28px] h-[28px] shrink-0 ${unlocked ? '' : 'grayscale opacity-50'}`}
+                  />
+                ) : (
+                  <img
+                    src={getRandomSvg(idx)}
+                    alt="badge icon"
+                    className={`w-[28px] h-[28px] shrink-0 ${unlocked ? '' : 'grayscale opacity-50'}`}
+                    style={{ imageRendering: 'pixelated' }}
+                  />
+                )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-[8px] mb-[4px]">
                     <div className="font-pixel text-[6px] leading-[1.5]">{currencyWordToGems(b.name)}</div>
