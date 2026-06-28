@@ -818,13 +818,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
       <section id="cta" className="mx-auto w-full max-w-5xl px-6 lg:px-8">
           <div className="w-full h-px relative flex justify-center items-center">
             {navigatorMerged && (
-              <div className="absolute w-full flex items-center -mt-px">
+              <div className="absolute w-full flex items-center">
                 <div className="flex-1 border-t border-[#291800] dark:border-[#f3e0bc]" />
-                <span className="mx-2 text-[#291800] dark:text-[#f3e0bc] text-[10px]">✦</span>
+                <span className="mx-2 text-[#291800] dark:text-[#f3e0bc] text-[10px] ">✦</span>
                 <div className="flex-1 border-t border-[#291800] dark:border-[#f3e0bc]" />
                 
                 {/* Static mascot + tooltip anchored to the right when merged */}
-                <div className="absolute right-0 bottom-1/2 z-[105] flex justify-center">
+                <div className="absolute right-0 bottom-0.5 z-[105] flex justify-center">
                   <div className="relative flex flex-col items-center justify-end">
                     <div className="absolute bottom-full mb-0 right-1/2 translate-x-[17px] flex justify-center">
                       <div key={navigatorLabel} className="navigator-tooltip animate-[fadeSlide_300ms_ease-out] transition-all duration-300 text-rose-500 dark:text-rose-400 font-mono uppercase">
@@ -838,7 +838,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
             )}
           </div>
           <div className={`grid grid-cols-1 md:grid-cols-2 border-x border-b border-[#291800] dark:border-[#f3e0bc]`}>
-            <div className="flex flex-col justify-center p-6 md:p-10 border-b md:border-b-0 md:border-r border-[#291800] dark:border-[#f3e0bc]">
+            <div className="flex flex-col justify-center p-6 md:p-10 mt-2 border-b md:border-b-0 md:border-r border-[#291800] dark:border-[#f3e0bc]">
               <h2 className="text-[28px] lg:text-[36px] font-extrabold leading-tight lg:text-[48px] text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174]">
                 Start your system today.
               </h2>
@@ -877,7 +877,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               >
                 How It Works
               </a>
-              <button className="col-span-2 flex items-center justify-center p-4 text-[14px] font-semibold text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] hover:bg-[#f3e0bc] dark:bg-[#4a3a1f] transition-colors border-b border-[#291800] dark:border-[#f3e0bc]">
+              <button className="col-span-2 flex items-center justify-center p-4 text-[14px] font-semibold text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] hover:bg-[#f3e0bc] dark:bg-[#4a3a1f] transition-colors ">
                 Talk to a Human
               </button>
             </div>
@@ -890,7 +890,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
           <div className="mx-auto w-full max-w-5xl px-6 lg:px-8">
             <div className="relative">
               {/* Tooltip + mascot on the right */}
-              <div className="absolute right-0 bottom-1/2 flex justify-center">
+              <div className="absolute right-0 bottom-0.5 flex justify-center">
                 <div className="relative flex flex-col items-center justify-end">
                   <div className="absolute bottom-full mb-0 right-1/2 translate-x-[17px] flex justify-center">
                     <div
