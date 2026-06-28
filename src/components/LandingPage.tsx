@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { CheckCircle2, ChevronDown, CircleX, Menu, X, Quote } from 'lucide-react';
 import { useScroll } from 'framer-motion';
 import { NemoMascot } from '@/components/NemoMascot';
