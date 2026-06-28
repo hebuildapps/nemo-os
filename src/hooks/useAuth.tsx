@@ -66,6 +66,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const deleteAccount = useCallback(async () => {
     const { error } = await supabase.rpc('delete_my_account');
     if (error) {
+      if (error.message?.includes('Could not find the function public.delete_my_account')) {
+        return {
+          error:
+            'Delete account is not set up in the current database yet. Run the latest Supabase migrations and try again.',
+        };
+      }
       return { error: error.message ?? 'Failed to delete account' };
     }
 

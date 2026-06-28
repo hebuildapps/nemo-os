@@ -33,7 +33,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onComplete }) => {
         <span className={`font-pixel text-[6px] px-[7px] py-[2px] border inline-flex items-center justify-center text-center leading-none ${diffCls}`}>{t.difficulty.toUpperCase()}</span>
         {t.is_break && <span className="font-pixel text-[6px] px-[7px] py-[2px] border border-coin text-coin inline-flex items-center justify-center text-center leading-none">BREAK</span>}
         {t.completed && <span className="font-pixel text-[6px] px-[7px] py-[2px] border border-nemo-green text-nemo-green inline-flex items-center justify-center text-center leading-none">✓ DONE</span>}
-        <span className="font-pixel text-[6px] px-[7px] py-[2px] border border-border text-muted-foreground bg-surface2 inline-flex items-center justify-center text-center leading-none">📅 {t.date}</span>
+        <span
+          className={`font-pixel text-[6px] px-[7px] py-[2px] border inline-flex items-center justify-center text-center leading-none ${
+            t.completed ? 'border-nemo-green text-nemo-green bg-nemo-green/10' : 'border-border text-muted-foreground bg-surface2'
+          }`}
+        >
+          📅 {t.date}
+        </span>
         <span className="font-pixel text-[6px] px-[7px] py-[2px] border border-border text-muted-foreground bg-surface2 inline-flex items-center justify-center text-center leading-none gap-[4px]">
           <img
             src="/diamond.png"

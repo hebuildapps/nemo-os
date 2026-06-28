@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { WorkspaceId } from '@/lib/nemo-data';
 import { useAuth } from '@/hooks/useAuth';
 import { useNemoData } from '@/hooks/useNemoData';
@@ -11,8 +12,9 @@ import ShopWorkspace from '@/components/ShopWorkspace';
 import ProfileWorkspace from '@/components/ProfileWorkspace';
 import Onboarding from '@/components/Onboarding';
 import AuthPage from '@/components/AuthPage';
-import AlphaGatePage from '@/components/AlphaGatePage';
+import LandingPage from '@/components/LandingPage';
 import McqModal from '@/components/McqModal';
+import FoundersNoteDialog from '@/components/FoundersNoteDialog';
 import { toast } from 'sonner';
 
 const FramedViewport: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -24,13 +26,67 @@ const FramedViewport: React.FC<{ children: React.ReactNode }> = ({ children }) =
 );
 
 const Index: React.FC = () => {
-  const isAlphaLockEnabled = (import.meta.env.VITE_ALPHA_LOCK_ENABLED ?? 'false') === 'true';
   const { user, loading: authLoading } = useAuth();
   const nemo = useNemoData();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [workspace, setWorkspace] = useState<WorkspaceId>('calendar');
   const [mcqTaskId, setMcqTaskId] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showFoundersNote, setShowFoundersNote] = useState(false);
   const [insufficientGems, setInsufficientGems] = useState<{ need: number; have: number } | null>(null);
+  const showAuth = searchParams.get('flow') === 'auth';
+  const showLanding = !user && !showAuth;
+
+  useEffect(() => {
+    if (!user || !searchParams.has('flow')) return;
+
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete('flow');
+      return next;
+    }, { replace: true });
+  }, [user, searchParams, setSearchParams]);
+
+  useEffect(() => {
+    // Landing needs page scroll; the app workspace keeps overflow hidden.
+    document.body.style.overflow = showLanding ? 'auto' : 'hidden';
+
+    return () => {
+      document.body.style.overflow = 'hidden';
+    };
+  }, [showLanding]);
+
+  useEffect(() => {
+    if (!user || !nemo.profile?.onboarding_complete) return;
+
+    const key = `nemo-founder-note-seen-${user.id}`;
+    if (window.localStorage.getItem(key) === '1') return;
+
+    setShowFoundersNote(true);
+  }, [user, nemo.profile]);
+
+  useEffect(() => {
+    // Wait until onboarding is complete before resuming a pending checkout.
+    const onboardingComplete = !!nemo.profile?.onboarding_complete;
+    if (!user || !onboardingComplete) return;
+
+    const pending = sessionStorage.getItem('pending_plan_id');
+    if (!pending) return;
+
+    // Keep pending_plan_id until the user confirms checkout on the post-onboard page.
+    // Redirect to the post-onboard flow where we collect exam results, show stats and pricing.
+    setTimeout(() => {
+      window.location.href = '/post-onboard';
+    }, 0);
+  }, [user, nemo.profile]);
+
+  const handleTryNemo = useCallback(() => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('flow', 'auth');
+      return next;
+    });
+  }, [setSearchParams]);
 
   const handleComplete = useCallback((id: string) => {
     const task = nemo.tasks.find(t => t.id === id);
@@ -95,6 +151,14 @@ const Index: React.FC = () => {
     toast('Plan reset complete.');
   }, [nemo]);
 
+  const closeFoundersNote = useCallback(() => {
+    if (user) {
+      const key = `nemo-founder-note-seen-${user.id}`;
+      window.localStorage.setItem(key, '1');
+    }
+    setShowFoundersNote(false);
+  }, [user]);
+
   // Loading state
   if (authLoading || (user && nemo.loading && !nemo.profile)) {
     return (
@@ -108,9 +172,13 @@ const Index: React.FC = () => {
 
   // Not logged in
   if (!user) {
+    if (showLanding) {
+      return <LandingPage onTryNemo={handleTryNemo} />;
+    }
+
     return (
       <FramedViewport>
-        {isAlphaLockEnabled ? <AlphaGatePage /> : <AuthPage />}
+        <AuthPage />
       </FramedViewport>
     );
   }
@@ -229,6 +297,12 @@ const Index: React.FC = () => {
             </div>
           </div>
         )}
+
+        <FoundersNoteDialog
+          open={showFoundersNote}
+          onClose={closeFoundersNote}
+          userId={user.id}
+        />
       </div>
     </FramedViewport>
   );

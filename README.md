@@ -34,6 +34,6 @@ When a user completes a task, a live Amazon Nova Lite call (via Amazon Bedrock) 
 
 - Clone the repo.
 - Run `npm install`.
-- Create `.env` in the root folder using `.env.example` as reference and fill in your keys.
-- Run `npm run dev` for frontend.
-- Run `uvicorn main:app --reload` inside nemo-backend for backend.
+- Create `.env` in the root folder & one more in nemo-backend folder using `.env.example` as reference and fill in your keys.
+- Run `npm run dev` for frontend in one terminal.
+- Run `uvicorn main:app --reload` inside nemo-backend for backend in another terminal simultaneously.

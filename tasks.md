@@ -1,0 +1,6 @@
+- div after the `Used by Focused learners`.. the testimonial div.. add a header to it saying `hear the word from our testers` use italic and "cooperLtBT","cooperLtBT Fallback" font for that header. For the `Start free, upgrade when ready` header just replace it's font to the same"cooperLtBT","cooperLtBT Fallback". 
+- Also, there are multiple testimonials through out the page but problem is just that all show five stars,
+   can you adjust one after other one to make random of scale from 4, 4.5 , 5 .. 
+- Map the `features` option in header to `Work smarter not harder` (request whenever user clicks on features/Why Nemo/Pricing option ~ make this section be at center of user's viewport page). 
+- Make 5 dollar as 4 dollar plan ~ add these additional features(on exisiting ones) ~ choose your starter pokemon companion. Get a rare early user badge. 20 gems as signup gift.
+- In 9 dollar plan ~ add these additional features(on exisiting ones) as choose your starter pokemon companion. Get a rare early user badge. 20 gems.

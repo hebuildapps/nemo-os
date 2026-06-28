@@ -1,4 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,700&family=Rubik:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+
+@font-face {
+  font-family: 'cooperLtBT';
+  src: url('/fonts/cooper-lt-bt font/cooper-lt-bt (1)/cooperltbtlight.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'cooperLtBT';
+  src: url('/fonts/cooper-lt-bt font/cooper-lt-bt (1)/cooperltbtlightitalic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
 
 @tailwind base;
 @tailwind components;
@@ -43,8 +58,13 @@
     --red: 0 48% 36%;
     --blue: 210 50% 36%;
 
+    --font-newsreader: 'Newsreader', serif;
+    --font-derif: 'DM Serif Display', serif;
+    --font-inter: 'Inter', sans-serif;
+    --font-rubik: 'Rubik', 'Rubik Fallback', sans-serif;
     --font-pixel: 'Press Start 2P', monospace;
     --font-mono: 'IBM Plex Mono', monospace;
+    --font-lexend: 'Lexend', sans-serif;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 220 10% 12%;
@@ -68,6 +88,40 @@
   }
 }
 
+mark{
+  background-color: transparent;
+  color: #47483a;
+  background-image:
+		linear-gradient(
+			to bottom right,
+			transparent 50%,
+			#f3e0bc 50% 100%
+		),
+		linear-gradient(
+			to right,
+			#f3e0bc,
+			#f3e0bc
+		),
+		linear-gradient(
+			to top left,
+			transparent 50%,
+			#f3e0bc 50%
+		)
+	;
+  background-size:
+		0.25em 1em,
+		calc(100% - 0.25em * 2 + 1px) 1em,
+		0.25em 1em
+	;
+	background-position:
+		left center,
+		center,
+		right center
+	;
+	background-repeat: no-repeat;
+
+}
+
 /* Pixel font utility */
 .font-pixel {
   font-family: var(--font-pixel);
@@ -75,6 +129,22 @@
 
 .font-mono {
   font-family: var(--font-mono);
+}
+
+.font-newsreader {
+  font-family: var(--font-newsreader);
+}
+
+.font-inter {
+  font-family: var(--font-inter);
+}
+
+.font-rubik {
+  font-family: var(--font-rubik);
+}
+
+.font-cooper {
+  font-family: 'cooperLtBT', 'Cooper LT BT', serif;
 }
 
 /* Tabular nums for counters */
@@ -102,4 +172,11 @@
     --tw-shadow-colored: 0 0 #0000 !important;
     box-shadow: none !important;
   }
+}
+
+
+.font-derif {
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+  font-style: regular;
 }

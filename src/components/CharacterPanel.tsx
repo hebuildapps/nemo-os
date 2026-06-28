@@ -126,13 +126,11 @@ const CharacterPanel: React.FC<CharacterPanelProps> = ({ profile, tasks }) => {
             {profile.equipped_item && (
               <img
                 src={equippedImageCandidates[0]}
-                alt={profile.equipped_item}
                 className="absolute z-[2] w-[64px] h-[64px] top-[75%] right-[25%] -translate-x-1/2 -translate-y-1/2"
                 data-fallback-step="0"
                 onError={(event) => {
                   const currentStep = Number(event.currentTarget.dataset.fallbackStep || '0');
                   const nextStep = currentStep + 1;
-
                   if (nextStep < equippedImageCandidates.length) {
                     event.currentTarget.dataset.fallbackStep = String(nextStep);
                     event.currentTarget.src = equippedImageCandidates[nextStep];
