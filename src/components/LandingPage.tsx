@@ -84,7 +84,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ container: scrollContainerRef });
 
-  const sectionConfig = [
+  const sectionConfig = useMemo(() => [
     { id: 'hero', label: 'NOW READING: HERO' },
     { id: 'features', label: 'NOW READING: EXAM PREP' },
     { id: 'testimonials', label: 'NOW READING: TESTIMONIALS' },
@@ -93,7 +93,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
     { id: 'results', label: 'NOW READING: RESULTS' },
     { id: 'pricing', label: 'NOW READING: PRICING' },
     { id: 'cta', label: 'FINAL SECTION' },
-  ];
+  ], []);
 
   useEffect(() => {
     let raf: number;
@@ -151,7 +151,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
       containerEl.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [sectionConfig]);
 
   const clearAccordionTimer = useCallback(() => {
     if (accordionTimerRef.current) {
@@ -178,7 +178,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
         });
       }
     }, 50);
-  }, [clearAccordionTimer]);
+  }, [clearAccordionTimer, smartPrepFeatures.length]);
 
   useEffect(() => {
     startAccordionTimer();
@@ -818,9 +818,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
       <section id="cta" className="mx-auto w-full max-w-5xl px-6 lg:px-8">
           <div className="w-full h-px relative flex justify-center items-center">
             {navigatorMerged && (
-              <div className="absolute w-full flex items-center -mt-px">
+              <div className="absolute w-full flex items-center">
                 <div className="flex-1 border-t border-[#291800] dark:border-[#f3e0bc]" />
-                <span className="mx-2 text-[#291800] dark:text-[#f3e0bc] text-[10px]">✦</span>
+                <span className="mx-2 text-[#291800] dark:text-[#f3e0bc] text-[10px] ">✦</span>
                 <div className="flex-1 border-t border-[#291800] dark:border-[#f3e0bc]" />
                 
                 {/* Static mascot + tooltip anchored to the right when merged */}

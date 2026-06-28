@@ -27,6 +27,7 @@ const AlphaGatePage: React.FC = () => {
       status: 'pending',
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any)
       .from('alpha_waitlist')
       .upsert(payload, { onConflict: 'email' });

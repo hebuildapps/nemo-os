@@ -33,6 +33,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     setError('');
     try {
       await onComplete(gender, name.trim() || 'NEMO', date, goal.trim(), ref.trim().toUpperCase());
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       setError(e.message || 'Something went wrong');
     }

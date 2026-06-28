@@ -73,6 +73,7 @@ export default function PostOnboard() {
         <label className="flex flex-col">
           <span className="text-sm text-muted-foreground">Last score (optional)</span>
           <input
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             value={currentScore as any}
             onChange={(e) => setCurrentScore(e.target.value === '' ? '' : Number(e.target.value))}
             className="input mt-1"
@@ -85,6 +86,7 @@ export default function PostOnboard() {
         <label className="flex flex-col">
           <span className="text-sm text-muted-foreground">Target score (optional)</span>
           <input
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             value={targetScore as any}
             onChange={(e) => setTargetScore(e.target.value === '' ? '' : Number(e.target.value))}
             className="input mt-1"
