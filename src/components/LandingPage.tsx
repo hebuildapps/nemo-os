@@ -191,7 +191,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
   };
 
   return (
-    <div ref={scrollContainerRef} className="font-rubik h-dvh w-full px-4 sm:px-8 overflow-y-auto bg-[#fff8f4] dark:bg-[#120d08] text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] relative">
+    <div ref={scrollContainerRef} className="font-rubik h-dvh w-full px-4 sm:px-8 overflow-y-auto bg-[#fff8f4] dark:bg-[#120d08] text-[#291800] dark:text-[#dcb174] relative">
       <style>{`
         @keyframes heroPulse {
           0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(70, 48, 13, 0.14); }
@@ -304,7 +304,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
       `}</style>
       <nav className="sticky top-0 z-50 border-b border-[#291800]/10 dark:border-[#f3e0bc]/10 bg-[#fff8f4]/85 dark:bg-[#120d08]/85 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 lg:px-8 lg:py-4">
-          <div className="text-[24px] lg:text-[30px] font-extrabold font-pixel leading-none">NEMO OS</div>
+          <div className="text-[18px] lg:text-[18px] font-extrabold font-pixel leading-none">NEMO OS</div>
           <div className="hidden items-center gap-8 md:flex">
             <a href="#work-smarter" onClick={(e) => scrollToSection(e, 'work-smarter')} className="text-[14px] text-[#291800]/70 dark:text-[#f3e0bc]/70 transition-colors hover:text-[#5c601d] dark:text-[#d3d977]">Features</a>
             <a href="#comparison" onClick={(e) => scrollToSection(e, 'comparison')} className="text-[14px] text-[#291800]/70 dark:text-[#f3e0bc]/70 transition-colors hover:text-[#5c601d] dark:text-[#d3d977]">Why Nemo</a>
@@ -320,7 +320,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
             </button>
           </div>
           <button
-            className="md:hidden p-2 text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174]"
+            className="md:hidden p-2 text-[#291800] dark:text-[#dcb174]"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -576,7 +576,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
 
         <section id="comparison" className="mx-auto w-full max-w-6xl px-6 py-16 lg:py-20 lg:px-8">
           <div className="mb-10 lg:mb-14 text-center">
-            <h2 className="text-[32px] lg:text-[42px] font-bold leading-tight lg:text-[50px]">It is time to study with a system</h2>
+            <h2 className="text-[32px] md:text-[42px] font-bold leading-tight lg:text-[50px]">It is time to study with a system</h2>
             <p className="mx-auto mt-3 max-w-2xl text-[15px] lg:text-[16px] text-[#47483a] dark:text-[#b4b5a3]">Replace random effort with structured momentum built for long exam journeys.</p>
           </div>
           <div className="hidden md:grid gap-8 md:grid-cols-2">
@@ -603,7 +603,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                   'Task completion with MCQ proof',
                   'Rewards that reinforce consistency',
                 ].map((item, index) => (
-                  <li key={item} className="flex gap-3 text-[14px] text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174]">
+                  <li key={item} className="flex gap-3 text-[14px] text-[#291800] dark:text-[#dcb174]">
                     <CheckCircle2 className="icon-pop mt-0.5 h-5 w-5 text-[#5c601d] dark:text-[#d3d977]" style={{ animationDelay: `${index * 110}ms` }} />
                     {item}
                   </li>
@@ -635,7 +635,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                   'Task completion with MCQ proof',
                   'Rewards that reinforce consistency',
                 ].map((item, index) => (
-                  <li key={item} className="flex gap-3 text-[13px] text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174]">
+                  <li key={item} className="flex gap-3 text-[13px] text-[#291800] dark:text-[#dcb174]">
                     <CheckCircle2 className="icon-pop mt-0.5 h-4 w-4 text-[#5c601d] dark:text-[#d3d977]" style={{ animationDelay: `${index * 110}ms` }} />
                     {item}
                   </li>
@@ -676,7 +676,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                 ))}
               </div>
 
-              <blockquote className="text-[18px] lg:text-[28px] font-medium leading-tight text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174]">
+              <blockquote className="text-[18px] lg:text-[28px] font-medium leading-tight text-[#291800] dark:text-[#dcb174]">
                 I used to get lost in the notes. Nemo forces me to focus on what actually moves the needle. It’s the Pareto principle, 
                 <span className="italic decoration-[#f3e0bc] underline decoration-4 underline-offset-4"> automated but it just works magically improving my grades.</span></blockquote>
               <div className="flex flex-col items-center gap-1">
@@ -689,7 +689,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
 
         <section id="pricing" className="mx-auto w-full max-w-7xl px-6 py-16 lg:py-20 lg:px-8">
           <div className="mb-10 lg:mb-12 text-center">
-            <h2 className="text-[32px] lg:text-[42px] font-bold lg:text-[54px] font-cooper">Start free, upgrade when ready</h2>
+            <h2 className="text-[32px] md:text-[42px] font-bold lg:text-[54px] font-cooper">Start free, upgrade when ready</h2>
             <p className="mx-auto mt-3 max-w-2xl text-[15px] lg:text-[16px] text-[#47483a] dark:text-[#b4b5a3]">Two clear tiers: Monthly for flexibility, and an olive-highlighted Lifetime plan for strongest long-term value.</p>
             <p className="mx-auto mt-2 max-w-xl text-[13px] font-semibold text-[#5c601d] dark:text-[#d3d977]">Most serious learners choose lifetime within 7 days.</p>
           </div>
@@ -712,7 +712,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               </ul>
               <button
                 onClick={onTryNemo}
-                className="mt-7 w-full rounded-xl border-2 border-[#5c601d] dark:border-[#d3d977] py-3 font-bold text-[#5c601d] dark:text-[#d3d977] transition-colors hover:bg-[#5c601d] dark:bg-[#d3d977] hover:text-white dark:text-[#120d08]"
+                className="mt-7 w-full rounded-xl border-2 border-[#5c601d] dark:border-[#d3d977] py-3 font-bold text-[#5c601d] dark:text-[#d3d977] transition-colors hover:bg-[#5c601d] dark:hover:bg-[#d3d977] hover:text-white dark:hover:text-[#120d08]"
               >
                 Choose Monthly
               </button>
@@ -734,7 +734,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               </ul>
               <button
                 onClick={onTryNemo}
-                className="mt-7 w-full rounded-xl bg-[#fff8f4] dark:bg-[#120d08] py-3 font-bold text-[#5c601d] dark:text-[#d3d977] transition-colors hover:bg-[#f3e0bc] dark:bg-[#4a3a1f]"
+                className="mt-7 w-full rounded-xl bg-[#fff8f4] dark:bg-[#120d08] py-3 font-bold text-[#5c601d] dark:text-[#d3d977] transition-colors hover:bg-[#f3e0bc] dark:hover:bg-[#4a3a1f]"
               >
                 Get Lifetime Access
               </button>
@@ -760,7 +760,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               </ul>
               <button
                 onClick={onTryNemo}
-                className="mt-5 w-full rounded-xl border-2 border-[#5c601d] dark:border-[#d3d977] py-2.5 text-[13px] font-bold text-[#5c601d] dark:text-[#d3d977] transition-colors hover:bg-[#5c601d] dark:bg-[#d3d977] hover:text-white dark:text-[#120d08]"
+                className="mt-5 w-full rounded-xl border-2 border-[#5c601d] dark:border-[#d3d977] py-2.5 text-[13px] font-bold text-[#5c601d] dark:text-[#d3d977] transition-colors hover:bg-[#5c601d] dark:hover:bg-[#d3d977] hover:text-white dark:hover:text-[#120d08]"
               >
                 Choose Monthly
               </button>
@@ -782,7 +782,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               </ul>
               <button
                 onClick={onTryNemo}
-                className="mt-5 w-full rounded-xl bg-[#fff8f4] dark:bg-[#120d08] py-2.5 text-[13px] font-bold text-[#5c601d] dark:text-[#d3d977] transition-colors hover:bg-[#f3e0bc] dark:bg-[#4a3a1f]"
+                className="mt-5 w-full rounded-xl bg-[#fff8f4] dark:bg-[#120d08] py-2.5 text-[13px] font-bold text-[#5c601d] dark:text-[#d3d977] transition-colors hover:bg-[#f3e0bc] dark:hover:bg-[#4a3a1f]"
               >
                 Get Lifetime Access
               </button>
@@ -824,7 +824,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                 <div className="flex-1 border-t border-[#291800] dark:border-[#f3e0bc]" />
                 
                 {/* Static mascot + tooltip anchored to the right when merged */}
-                <div className="absolute right-0 bottom-1/2 z-[105] flex justify-center">
+                <div className="absolute right-0 bottom-0.5 z-[105] flex justify-center">
                   <div className="relative flex flex-col items-center justify-end">
                     <div className="absolute bottom-full mb-0 right-1/2 translate-x-[17px] flex justify-center">
                       <div key={navigatorLabel} className="navigator-tooltip animate-[fadeSlide_300ms_ease-out] transition-all duration-300 text-rose-500 dark:text-rose-400 font-mono uppercase">
@@ -838,8 +838,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
             )}
           </div>
           <div className={`grid grid-cols-1 md:grid-cols-2 border-x border-b border-[#291800] dark:border-[#f3e0bc]`}>
-            <div className="flex flex-col justify-center p-6 md:p-10 border-b md:border-b-0 md:border-r border-[#291800] dark:border-[#f3e0bc]">
-              <h2 className="text-[28px] lg:text-[36px] font-extrabold leading-tight lg:text-[48px] text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174]">
+            <div className="flex flex-col justify-center p-6 mt-2 md:p-10 border-b md:border-b-0 md:border-r border-[#291800] dark:border-[#f3e0bc]">
+              <h2 className="text-[28px] md:text-[36px] font-extrabold leading-tight lg:text-[48px] text-[#291800] dark:text-[#dcb174]">
                 Start your system today.
               </h2>
               <p className="mt-2 text-[18px] font-semibold text-[#5c601d] dark:text-[#d3d977]">
@@ -852,32 +852,32 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
             <div className="grid grid-cols-2 grid-rows-[1fr_1fr_auto]">
               <button
                 onClick={onTryNemo}
-                className="flex items-center justify-center p-6 md:p-8 border-b border-r border-[#291800] dark:border-[#f3e0bc] text-[14px] font-semibold text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] hover:bg-[#f3e0bc] dark:bg-[#4a3a1f] transition-colors"
+                className="flex items-center justify-center p-6 md:p-8 border-b border-r border-[#291800] dark:border-[#f3e0bc] text-[14px] font-semibold text-[#291800] dark:text-[#dcb174] hover:bg-[#f3e0bc] dark:hover:bg-[#4a3a1f] transition-colors"
               >
                 Try Nemo Free
               </button>
               <a
                 href="#pricing"
                 onClick={(e) => scrollToSection(e, 'pricing')}
-                className="flex items-center justify-center p-6 md:p-8 border-b border-[#291800] dark:border-[#f3e0bc] text-[14px] font-semibold text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] hover:bg-[#f3e0bc] dark:bg-[#4a3a1f] transition-colors"
+                className="flex items-center justify-center p-6 md:p-8 border-b border-[#291800] dark:border-[#f3e0bc] text-[14px] font-semibold text-[#291800] dark:text-[#dcb174] hover:bg-[#f3e0bc] dark:hover:bg-[#4a3a1f] transition-colors"
               >
                 View Pricing
               </a>
               <a
                 href="#features"
                 onClick={(e) => scrollToSection(e, 'features')}
-                className="flex items-center justify-center p-6 md:p-8 border-b border-r border-[#291800] dark:border-[#f3e0bc] text-[14px] font-semibold text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] hover:bg-[#f3e0bc] dark:bg-[#4a3a1f] transition-colors"
+                className="flex items-center justify-center p-6 md:p-8 border-b border-r border-[#291800] dark:border-[#f3e0bc] text-[14px] font-semibold text-[#291800] dark:text-[#dcb174] hover:bg-[#f3e0bc] dark:hover:bg-[#4a3a1f] transition-colors"
               >
                 Features
               </a>
               <a
                 href="#work-smarter"
                 onClick={(e) => scrollToSection(e, 'work-smarter')}
-                className="flex items-center justify-center p-6 md:p-8 border-b border-[#291800] dark:border-[#f3e0bc] text-[14px] font-semibold text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] hover:bg-[#f3e0bc] dark:bg-[#4a3a1f] transition-colors"
+                className="flex items-center justify-center p-6 md:p-8 border-b border-[#291800] dark:border-[#f3e0bc] text-[14px] font-semibold text-[#291800] dark:text-[#dcb174] hover:bg-[#f3e0bc] dark:hover:bg-[#4a3a1f] transition-colors"
               >
                 How It Works
               </a>
-              <button className="col-span-2 flex items-center justify-center p-4 text-[14px] font-semibold text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] hover:bg-[#f3e0bc] dark:bg-[#4a3a1f] transition-colors border-b border-[#291800] dark:border-[#f3e0bc]">
+              <button className="col-span-2 flex items-center justify-center p-4 text-[14px] font-semibold text-[#291800] dark:text-[#dcb174] hover:bg-[#f3e0bc] dark:hover:bg-[#4a3a1f] transition-colors">
                 Talk to a Human
               </button>
             </div>
@@ -890,7 +890,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
           <div className="mx-auto w-full max-w-5xl px-6 lg:px-8">
             <div className="relative">
               {/* Tooltip + mascot on the right */}
-              <div className="absolute right-0 bottom-1/2 flex justify-center">
+              <div className="absolute right-0 bottom-0.5 flex justify-center">
                 <div className="relative flex flex-col items-center justify-end">
                   <div className="absolute bottom-full mb-0 right-1/2 translate-x-[17px] flex justify-center">
                     <div
@@ -921,30 +921,30 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
       <footer className="mx-auto w-full max-w-5xl px-6 lg:px-8 pb-8 lg:pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 border-x border-b border-[#291800] dark:border-[#f3e0bc]">
           <div className="p-5 border-b md:border-b-0 md:border-r border-[#291800] dark:border-[#f3e0bc]">
-            <h4 className="text-[12px] font-bold uppercase tracking-[0.12em] text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] mb-3">Product</h4>
+            <h4 className="text-[12px] font-bold uppercase tracking-[0.12em] text-[#291800] dark:text-[#dcb174] mb-3">Product</h4>
             <ul className="space-y-1.5">
-              <li><a href="#features" onClick={(e) => scrollToSection(e, 'features')} className="text-[13px] text-[#47483a] dark:text-[#b4b5a3] hover:text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] transition-colors">Features</a></li>
-              <li><a href="#pricing" onClick={(e) => scrollToSection(e, 'pricing')} className="text-[13px] text-[#47483a] dark:text-[#b4b5a3] hover:text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] transition-colors">Pricing</a></li>
-              <li><a href="#comparison" onClick={(e) => scrollToSection(e, 'comparison')} className="text-[13px] text-[#47483a] dark:text-[#b4b5a3] hover:text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] transition-colors">Why Nemo</a></li>
+              <li><a href="#features" onClick={(e) => scrollToSection(e, 'features')} className="text-[13px] text-[#47483a] dark:text-[#b4b5a3] hover:text-[#291800] dark:hover:text-[#dcb174] transition-colors">Features</a></li>
+              <li><a href="#pricing" onClick={(e) => scrollToSection(e, 'pricing')} className="text-[13px] text-[#47483a] dark:text-[#b4b5a3] hover:text-[#291800] dark:hover:text-[#dcb174] transition-colors">Pricing</a></li>
+              <li><a href="#comparison" onClick={(e) => scrollToSection(e, 'comparison')} className="text-[13px] text-[#47483a] dark:text-[#b4b5a3] hover:text-[#291800] dark:hover:text-[#dcb174] transition-colors">Why Nemo</a></li>
             </ul>
           </div>
           <div className="p-5">
-            <h4 className="text-[12px] font-bold uppercase tracking-[0.12em] text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] mb-3">Connect</h4>
+            <h4 className="text-[12px] font-bold uppercase tracking-[0.12em] text-[#291800] dark:text-[#dcb174] mb-3">Connect</h4>
             <ul className="space-y-1.5">
-              <li><a href="#" className="text-[13px] text-[#47483a] dark:text-[#b4b5a3] hover:text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] transition-colors">Twitter</a></li>
-              <li><a href="#" className="text-[13px] text-[#47483a] dark:text-[#b4b5a3] hover:text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] transition-colors">GitHub</a></li>
-              <li><a href="#" className="text-[13px] text-[#47483a] dark:text-[#b4b5a3] hover:text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174] transition-colors">Discord</a></li>
+              <li><a href="#" className="text-[13px] text-[#47483a] dark:text-[#b4b5a3] hover:text-[#291800] dark:hover:text-[#dcb174] transition-colors">Twitter</a></li>
+              <li><a href="#" className="text-[13px] text-[#47483a] dark:text-[#b4b5a3] hover:text-[#291800] dark:hover:text-[#dcb174] transition-colors">GitHub</a></li>
+              <li><a href="#" className="text-[13px] text-[#47483a] dark:text-[#b4b5a3] hover:text-[#291800] dark:hover:text-[#dcb174] transition-colors">Discord</a></li>
             </ul>
           </div>
         </div>
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-x border-b border-[#291800] dark:border-[#f3e0bc] p-5">
           <div>
-            <div className="text-[18px] font-bold font-pixel text-[#291800] dark:text-[#f3e0bc] dark:text-[#dcb174]">NEMO OS</div>
+            <div className="text-[18px] font-bold font-pixel text-[#291800] dark:text-[#dcb174]">NEMO OS</div>
             <p className="text-[11px] text-[#47483a] dark:text-[#b4b5a3] mt-0.5">© 2026 Nemo OS. All rights reserved.</p>
           </div>
           <div className="flex items-center gap-2 text-[11px] text-[#47483a] dark:text-[#b4b5a3]">
             <span className="relative flex items-center justify-center w-3.5 h-3.5">
-              <span className="absolute h-2.5 w-2.5 rounded-full bg-[#1d601f]"></span>
+              <span className="absolute h-2.5 w-2.5 rounded-full bg-[#27822a]"></span>
               <span className="absolute h-3.5 w-3.5 rounded-full bg-[#1d601f]/25 animate-ping"></span>
             </span>
             <span>System operational</span>
