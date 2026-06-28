@@ -239,7 +239,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
         .hero-float-label { animation: floatLabel 4.2s ease-in-out infinite; }
         .icon-shake { animation: iconShake 4s ease-in-out infinite; }
         .icon-pop { animation: iconPop 0.5s ease-out both; }
-        .feature-video-reveal { animation: videoSwapIn 0.35s ease-out both; }
+        .icon-pop { animation: iconPop 0.5s ease-out both; }
         .cta-bg-motion {
           background-size: 200% 200%;
           animation: ctaShift 10s ease-in-out infinite;
@@ -418,11 +418,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
 
         <section id="features" className="border-y border-[#291800]/10 dark:border-[#f3e0bc]/10 bg-[#fff1e4]/50 dark:bg-[#20150b]/50 py-10">
           <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-4 justify-center px-6 lg:px-8">
-            <div className="flex flex-wrap justify-center items-center gap-8">
-              <span className="lg:text-[14px] text-[12px] font-bold uppercase tracking-[0.1em] text-[#47483a] dark:text-[#b4b5a3]">Used by focused learners preparing for</span>
-              {['UPSC', 'CAT', 'GATE', 'GMAT', 'JEE'].map((item) => (
-                <span key={item} className="lg:text-[28px] text-[14px] font-bold text-[#725731] dark:text-[#dcb174]">{item}</span>
-              ))}
+            <div className="flex flex-col items-center gap-4">
+              <span className="lg:text-[14px] text-[12px] font-bold uppercase tracking-[0.1em] text-[#47483a] dark:text-[#b4b5a3] text-center">Used by focused learners preparing for</span>
+              <div className="flex flex-wrap justify-center items-center gap-8">
+                {['UPSC', 'CAT', 'GATE', 'GMAT', 'JEE'].map((item) => (
+                  <span key={item} className="lg:text-[28px] text-[14px] font-bold text-[#725731] dark:text-[#dcb174]">{item}</span>
+                ))}
+              </div>
             </div>
             <span className="text-[14px] font-newsreader italic text-[#393938] dark:text-[#cfcfcf]">& MANY MORE.</span>
           </div>
@@ -460,7 +462,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               );
             })}
           </div>
-          <div id="testimonial-scroll" className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-2">
+          <div id="testimonial-scroll" onScroll={(e) => {
+            const scrollLeft = e.currentTarget.scrollLeft;
+            const cardWidth = (e.currentTarget.firstChild as HTMLElement)?.offsetWidth || 280;
+            const index = Math.round(scrollLeft / cardWidth);
+            if (index !== testimonialActiveIndex) setTestimonialActiveIndex(index);
+          }} className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-2">
             {testimonials.map((item, index) => {
               const starRatings = [5, 4, 4.5];
               const rating = starRatings[index % 3];
@@ -559,10 +566,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
             <div className="lg:sticky lg:top-28 flex items-center justify-center">
               <div className="overflow-hidden rounded-2xl lg:rounded-3xl border-2 border-[#d4b896]/30">
                 <video
-                  key={smartPrepFeatures[activeFeatureIndex].video}
                   src={smartPrepFeatures[activeFeatureIndex].video}
                   preload="metadata"
-                  className="feature-video-reveal aspect-[4/3] lg:aspect-video w-full max-w-[320px] lg:max-w-none object-cover"
+                  className="aspect-[4/3] lg:aspect-video w-full max-w-[320px] lg:max-w-none object-cover"
                   autoPlay
                   muted
                   loop
@@ -599,9 +605,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               <h3 className="text-[30px] font-bold text-[#46300D] dark:text-[#e0c8a3]">With Nemo OS</h3>
               <ul className="mt-6 space-y-5">
                 {[
-                  'Daily roadmap from your exam target',
-                  'Task completion with MCQ proof',
-                  'Rewards that reinforce consistency',
+                  'Full task & streak system from your exam target',
+                  'Task completion with MCQ proof & badge tracking',
+                  'Companions & rewards that reinforce consistency',
                 ].map((item, index) => (
                   <li key={item} className="flex gap-3 text-[14px] text-[#291800] dark:text-[#dcb174]">
                     <CheckCircle2 className="icon-pop mt-0.5 h-5 w-5 text-[#5c601d] dark:text-[#d3d977]" style={{ animationDelay: `${index * 110}ms` }} />
@@ -611,7 +617,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               </ul>
             </article>
           </div>
-          <div id="comparison-scroll" className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-2">
+          <div id="comparison-scroll" onScroll={(e) => {
+            const scrollLeft = e.currentTarget.scrollLeft;
+            const cardWidth = (e.currentTarget.firstChild as HTMLElement)?.offsetWidth || 280;
+            const index = Math.round(scrollLeft / cardWidth);
+            if (index !== comparisonActiveIndex) setComparisonActiveIndex(index);
+          }} className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-2">
             <article className="snap-center shrink-0 w-[72vw] max-w-[300px] rounded-xl border-2 border-[#ffdad6] dark:border-[#690005] bg-white dark:bg-[#1c1a17] p-5 opacity-80 saturate-50">
               <h3 className="text-[22px] font-bold text-[#ba1a1a] dark:text-[#ff8a8a]">Without Nemo</h3>
               <ul className="mt-4 space-y-4">
@@ -631,9 +642,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               <h3 className="text-[22px] font-bold text-[#46300D] dark:text-[#e0c8a3]">With Nemo OS</h3>
               <ul className="mt-4 space-y-4">
                 {[
-                  'Daily roadmap from your exam target',
-                  'Task completion with MCQ proof',
-                  'Rewards that reinforce consistency',
+                  'Full task & streak system from your exam target',
+                  'Task completion with MCQ proof & badge tracking',
+                  'Companions & rewards that reinforce consistency',
                 ].map((item, index) => (
                   <li key={item} className="flex gap-3 text-[13px] text-[#291800] dark:text-[#dcb174]">
                     <CheckCircle2 className="icon-pop mt-0.5 h-4 w-4 text-[#5c601d] dark:text-[#d3d977]" style={{ animationDelay: `${index * 110}ms` }} />
@@ -741,7 +752,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               <p className="mt-3 text-center text-[11px] text-white/75 dark:text-white/75">Most students choose this after trying monthly.</p>
             </article>
           </div>
-          <div id="pricing-scroll" className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-2">
+          <div id="pricing-scroll" onScroll={(e) => {
+            const scrollLeft = e.currentTarget.scrollLeft;
+            const cardWidth = (e.currentTarget.firstChild as HTMLElement)?.offsetWidth || 280;
+            const index = Math.round(scrollLeft / cardWidth);
+            if (index !== pricingActiveIndex) setPricingActiveIndex(index);
+          }} className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-2">
             <article className="snap-center shrink-0 w-[72vw] max-w-[300px] rounded-xl border border-[#c9c7b6] dark:border-[#525148] bg-[#fff1e4] dark:bg-[#20150b] p-5">
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#47483a] dark:text-[#b4b5a3]">Monthly</p>
               <div className="mt-3 flex items-end gap-1">
@@ -831,7 +847,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                         {navigatorLabel}
                       </div>
                     </div>
-                    <NemoMascot scrollYProgress={scrollYProgress} className="w-8 sm:w-10 h-auto relative z-10" />
+                    <NemoMascot scrollYProgress={scrollYProgress} className="w-10 sm:w-10 h-auto relative z-10" />
                   </div>
                 </div>
               </div>
@@ -886,7 +902,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
       </main>
 
       {navigatorVisible && !navigatorMerged && (
-        <div className="pointer-events-none fixed bottom-6 sm:bottom-8 z-[100] w-full">
+        <div className="pointer-events-none fixed bottom-8 sm:bottom-10 z-[100] w-full">
           <div className="mx-auto w-full max-w-5xl px-6 lg:px-8">
             <div className="relative">
               {/* Tooltip + mascot on the right */}
@@ -900,7 +916,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                       {navigatorLabel}
                     </div>
                   </div>
-                  <NemoMascot scrollYProgress={scrollYProgress} className="w-8 sm:w-10 h-auto relative z-10" />
+                  <NemoMascot scrollYProgress={scrollYProgress} className="w-10 sm:w-10 h-auto relative z-10" />
                 </div>
               </div>
               <div className="flex items-center w-full">
@@ -953,7 +969,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
       </footer>
 
       {/* Bottom Blur */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[15] h-[60px] select-none bg-gradient-to-t from-background to-transparent opacity-100 backdrop-blur-[5px] [mask-image:linear-gradient(to_top,black_50%,transparent)] [-webkit-mask-image:linear-gradient(to_top,black_50%,transparent)]" />
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[15] h-[80px] select-none bg-gradient-to-t from-background to-transparent opacity-100 backdrop-blur-[5px] [mask-image:linear-gradient(to_top,black_50%,transparent)] [-webkit-mask-image:linear-gradient(to_top,black_50%,transparent)]" />
 
 
       {heroModalOpen && (
