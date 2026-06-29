@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { CheckCircle2, ChevronDown, CircleX, Menu, X, Quote } from 'lucide-react';
+import { CheckCircle2, ChevronDown, CircleX, Menu, X, Quote, LogIn } from 'lucide-react';
 import { useScroll } from 'framer-motion';
 import { NemoMascot } from '@/components/NemoMascot';
 import { Analytics } from "@vercel/analytics/next";
@@ -74,10 +74,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
   const [testimonialActiveIndex, setTestimonialActiveIndex] = useState(0);
   const [pricingActiveIndex, setPricingActiveIndex] = useState(0);
   const [comparisonActiveIndex, setComparisonActiveIndex] = useState(0);
-  const [accordionProgress, setAccordionProgress] = useState(0);
-  const accordionTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const accordionPausedRef = useRef(false);
-  const ACCORDION_INTERVAL = 4000;
 
   const [navigatorLabel, setNavigatorLabel] = useState('NOW READING: HERO');
   const [navigatorMerged, setNavigatorMerged] = useState(false);
@@ -154,37 +150,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
     };
   }, []);
 
-  const clearAccordionTimer = useCallback(() => {
-    if (accordionTimerRef.current) {
-      clearInterval(accordionTimerRef.current);
-      accordionTimerRef.current = null;
-    }
-  }, []);
-
-  const startAccordionTimer = useCallback(() => {
-    clearAccordionTimer();
-    setAccordionProgress(0);
-    const startTime = Date.now();
-    accordionTimerRef.current = setInterval(() => {
-      if (accordionPausedRef.current) return;
-      const elapsed = Date.now() - startTime;
-      const fraction = Math.min(elapsed / ACCORDION_INTERVAL, 1);
-      setAccordionProgress(fraction);
-      if (fraction >= 1) {
-        clearAccordionTimer();
-        setActiveFeatureIndex((prev) => (prev + 1) % smartPrepFeatures.length);
-        setOpenFeatureIndex((prev) => {
-          const next = ((prev ?? 0) + 1) % smartPrepFeatures.length;
-          return next;
-        });
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>, setActive: React.Dispatch<React.SetStateAction<number>>, currentIndex: number) => {
+    const container = e.currentTarget;
+    const scrollCenter = container.scrollLeft + container.clientWidth / 2;
+    let minDistance = Infinity;
+    let activeIndex = 0;
+    Array.from(container.children).forEach((child, i) => {
+      const el = child as HTMLElement;
+      const childCenter = el.offsetLeft + el.offsetWidth / 2 - container.offsetLeft;
+      const distance = Math.abs(childCenter - scrollCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        activeIndex = i;
       }
-    }, 50);
-  }, [clearAccordionTimer]);
-
-  useEffect(() => {
-    startAccordionTimer();
-    return () => clearAccordionTimer();
-  }, [activeFeatureIndex, startAccordionTimer, clearAccordionTimer]);
+    });
+    if (activeIndex !== currentIndex) setActive(activeIndex);
+  }, []);
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
@@ -263,7 +244,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
           letter-spacing: 0.1em;
           padding: 3px 8px;
           white-space: nowrap;
-          background-image: radial-gradient(circle, rgba(41, 24, 0, 0.5) 0.5px, transparent 0.5px);
+          background-image: radial-gradient(circle, rgba(41, 24, 0, 0.3) 0.5px, transparent 0.5px);
           background-size: 4px 4px;
         }
         .navigator-tooltip::after {
@@ -293,7 +274,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
           .navigator-tooltip {
               background: #FFF8F4;
               border-color: #f3e0bc;
-              background-image: radial-gradient(circle, rgba(243, 224, 188, 0.5) 0.5px, transparent 0.5px);
+              background-image: radial-gradient(circle, rgba(243, 224, 188, 0.3) 0.5px, transparent 0.5px);
           }
           .navigator-tooltip::after {
             border-color: #f3e0bc transparent transparent transparent;
@@ -320,13 +301,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               Try Nemo
             </button>
           </div>
-          <button
-            className="md:hidden p-2 text-[#291800] dark:text-[#dcb174]"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={onTryNemo}
+              className="inline-flex items-center gap-1.5 rounded-md bg-[#5c601d] px-2.5 py-1.5 text-[13px] font-medium text-white hover:bg-[#757934] transition-colors sm:px-3"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Login</span>
+            </button>
+            <button
+              className="p-2 text-[#291800] dark:text-[#dcb174]"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-[#291800]/10 dark:border-[#f3e0bc]/10 bg-[#fff8f4] dark:bg-[#120d08] px-4 py-4 flex flex-col gap-4">
@@ -419,11 +409,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
 
         <section id="features" className="border-y border-[#291800]/10 dark:border-[#f3e0bc]/10 bg-[#fff1e4]/50 dark:bg-[#20150b]/50 py-10">
           <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-4 justify-center px-6 lg:px-8">
-            <div className="flex flex-wrap justify-center items-center gap-8">
-              <span className="lg:text-[14px] text-[12px] font-bold uppercase tracking-[0.1em] text-[#47483a] dark:text-[#b4b5a3]">Used by focused learners preparing for</span>
-              {['UPSC', 'CAT', 'GATE', 'GMAT', 'JEE'].map((item) => (
-                <span key={item} className="lg:text-[28px] text-[14px] font-bold text-[#725731] dark:text-[#dcb174]">{item}</span>
-              ))}
+            <div className="text-center w-full">
+              <span className="block lg:text-[14px] text-[12px] font-bold uppercase tracking-[0.1em] text-[#47483a] dark:text-[#b4b5a3] mb-4">Used by focused learners preparing for</span>
+              <div className="flex flex-wrap justify-center items-center gap-6 lg:gap-8">
+                {['UPSC', 'CAT', 'GATE', 'GMAT', 'JEE'].map((item) => (
+                  <span key={item} className="lg:text-[28px] text-[14px] font-bold text-[#725731] dark:text-[#dcb174]">{item}</span>
+                ))}
+              </div>
             </div>
             <span className="text-[14px] font-newsreader italic text-[#393938] dark:text-[#cfcfcf]">& MANY MORE.</span>
           </div>
@@ -461,7 +453,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               );
             })}
           </div>
-          <div id="testimonial-scroll" className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-2">
+          <div id="testimonial-scroll" onScroll={(e) => handleScroll(e, setTestimonialActiveIndex, testimonialActiveIndex)} className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-2">
             {testimonials.map((item, index) => {
               const starRatings = [5, 4, 4.5];
               const rating = starRatings[index % 3];
@@ -527,12 +519,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                         onClick={() => {
                           setActiveFeatureIndex(index);
                           setOpenFeatureIndex((prev) => (prev === index ? null : index));
-                          accordionPausedRef.current = true;
-                          setTimeout(() => {
-                            accordionPausedRef.current = false;
-                            clearAccordionTimer();
-                            startAccordionTimer();
-                          }, 5000);
                         }}
                       >
                         <span className="text-[20px] lg:text-[24px] md:text-[28px] font-semibold leading-tight text-[#46300D] dark:text-[#e0c8a3]">{index + 1}. {feature.title}</span>
@@ -543,15 +529,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                         <p className="text-[15px] font-bold leading-relaxed text-[#46300D] dark:text-[#e0c8a3]">{feature.outcome}</p>
                         <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-[#4b3a20] dark:text-[#c4b399]">{feature.description}</p>
                       </div>
-
-                      {isActive && (
-                        <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-[#e1d3bd]">
-                          <div
-                            className="h-full rounded-full bg-[#5c601d] dark:bg-[#d3d977] transition-[width] duration-75 ease-linear"
-                            style={{ width: `${accordionProgress * 100}%` }}
-                          />
-                        </div>
-                      )}
                     </div>
                   );
                 })}
@@ -612,7 +589,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               </ul>
             </article>
           </div>
-          <div id="comparison-scroll" className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-2">
+          <div id="comparison-scroll" onScroll={(e) => handleScroll(e, setComparisonActiveIndex, comparisonActiveIndex)} className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-2">
             <article className="snap-center shrink-0 w-[72vw] max-w-[300px] rounded-xl border-2 border-[#ffdad6] dark:border-[#690005] bg-white dark:bg-[#1c1a17] p-5 opacity-80 saturate-50">
               <h3 className="text-[22px] font-bold text-[#ba1a1a] dark:text-[#ff8a8a]">Without Nemo</h3>
               <ul className="mt-4 space-y-4">
@@ -704,12 +681,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               <p className="mt-2 text-[14px] text-[#47483a] dark:text-[#b4b5a3]">Best for trying Nemo with low commitment.</p>
               <p className="mt-1 text-[12px] font-semibold text-[#6f5a34] dark:text-[#dcb174]">No lock-in. Upgrade anytime.</p>
               <ul className="mt-5 space-y-3 text-[14px] text-[#393938] dark:text-[#cfcfcf]">
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#5c601d] dark:text-[#d3d977]" /> Full task + streak system</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#5c601d] dark:text-[#d3d977]" /> Progress and badge tracking</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#5c601d] dark:text-[#d3d977]" /> Cancel anytime</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#5c601d] dark:text-[#d3d977]" /> Choose your starter pokemon companion</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#5c601d] dark:text-[#d3d977]" /> Rare early user badge</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#5c601d] dark:text-[#d3d977]" /> 20 gems as signup gift</li>
+                {[
+                  { text: "Full task + streak system", img: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=150&q=80", angle: 75 },
+                  { text: "Progress and badge tracking", img: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=150&q=80", angle: 105 },
+                  { text: "Cancel anytime", img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=150&q=80", angle: 85 },
+                  { text: "Choose your starter pokemon companion", img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=150&q=80", angle: 115 },
+                  { text: "Rare early user badge", img: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=150&q=80", angle: 95 },
+                  { text: "20 gems as signup gift", img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=150&q=80", angle: 120 }
+                ].map((pt, i) => (
+                  <li key={i} className="group relative flex items-center gap-2 cursor-default">
+                    <CheckCircle2 className="h-4 w-4 text-[#5c601d] dark:text-[#d3d977]" /> 
+                    <span>{pt.text}</span>
+                    <div className="pointer-events-none absolute bottom-full mb-1 left-[10%] z-50 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:-translate-y-2 group-hover:scale-110">
+                      <img src={pt.img} alt="" className="w-24 h-24 object-cover rounded-xl shadow-2xl border-2 border-[#fff8f4]/50 dark:border-[#120d08]/50" style={{ transform: `rotate(${pt.angle}deg)` }} />
+                    </div>
+                  </li>
+                ))}
               </ul>
               <button
                 onClick={onTryNemo}
@@ -726,12 +713,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               </div>
               <p className="mt-2 text-[14px] text-white/85 dark:text-white/85">One payment. Keep your prep system for every future goal.</p>
               <ul className="mt-5 space-y-3 text-[14px] text-white/95 dark:text-white/95">
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#f3e0bc] dark:text-[#dcb174]" /> Everything in Monthly</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#f3e0bc] dark:text-[#dcb174]" /> Lifetime updates</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#f3e0bc] dark:text-[#dcb174]" /> Best value for long exam cycles</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#f3e0bc] dark:text-[#dcb174]" /> Unlimited revisions on plan</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#f3e0bc] dark:text-[#dcb174]" /> Rare early user badge + lifetime support benefits</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#f3e0bc] dark:text-[#dcb174]" /> 50 gems</li>
+                {[
+                  { text: "Everything in Monthly", img: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=150&q=80", angle: 80 },
+                  { text: "Lifetime updates", img: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=150&q=80", angle: 110 },
+                  { text: "Best value for long exam cycles", img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=150&q=80", angle: 90 },
+                  { text: "Unlimited revisions on plan", img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=150&q=80", angle: 115 },
+                  { text: "Rare early user badge + lifetime support benefits", img: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=150&q=80", angle: 75 },
+                  { text: "50 gems", img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=150&q=80", angle: 100 }
+                ].map((pt, i) => (
+                  <li key={i} className="group relative flex items-center gap-2 cursor-default">
+                    <CheckCircle2 className="h-4 w-4 text-[#f3e0bc] dark:text-[#dcb174]" /> 
+                    <span>{pt.text}</span>
+                    <div className="pointer-events-none absolute bottom-full mb-1 left-[10%] z-50 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:-translate-y-2 group-hover:scale-110">
+                      <img src={pt.img} alt="" className="w-24 h-24 object-cover rounded-xl shadow-2xl border-2 border-white/20" style={{ transform: `rotate(${pt.angle}deg)` }} />
+                    </div>
+                  </li>
+                ))}
               </ul>
               <button
                 onClick={onTryNemo}
@@ -742,7 +739,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               <p className="mt-3 text-center text-[11px] text-white/75 dark:text-white/75">Most students choose this after trying monthly.</p>
             </article>
           </div>
-          <div id="pricing-scroll" className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-2">
+          <div id="pricing-scroll" onScroll={(e) => handleScroll(e, setPricingActiveIndex, pricingActiveIndex)} className="md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 pb-2">
             <article className="snap-center shrink-0 w-[72vw] max-w-[300px] rounded-xl border border-[#c9c7b6] dark:border-[#525148] bg-[#fff1e4] dark:bg-[#20150b] p-5">
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#47483a] dark:text-[#b4b5a3]">Monthly</p>
               <div className="mt-3 flex items-end gap-1">
@@ -832,7 +829,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                         {navigatorLabel}
                       </div>
                     </div>
-                    <NemoMascot scrollYProgress={scrollYProgress} className="w-8 sm:w-10 h-auto relative z-10" />
+                    <NemoMascot scrollYProgress={scrollYProgress} className="w-24 sm:w-10 h-auto relative z-10" />
                   </div>
                 </div>
               </div>
