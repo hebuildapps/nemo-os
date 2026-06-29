@@ -52,7 +52,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
     {
       name: 'Savio V.',
       exam: 'GATE Exam',
-      result: '4.5 hrs/week &#8594; 5.2 hrs of deep work consistency',
+      result: '4.5 hrs/week \u2192 5.2 hrs of deep work consistency',
       lead: 'The reward system felt simple at first, but ',
       highlight: 'it removed my procrastination spiral',
       tail: ' and made me show up even on low-energy days.',
@@ -692,9 +692,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                   <li key={i} className="group relative flex items-center gap-2 cursor-default">
                     <CheckCircle2 className="h-4 w-4 text-[#5c601d] dark:text-[#d3d977]" /> 
                     <span>{pt.text}</span>
-                    <div className="pointer-events-none absolute bottom-full mb-1 left-[10%] z-50 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:-translate-y-2 group-hover:scale-110">
-                      <img src={pt.img} alt="" className="w-24 h-24 object-cover rounded-xl shadow-2xl border-2 border-[#fff8f4]/50 dark:border-[#120d08]/50" style={{ transform: `rotate(${pt.angle}deg)` }} />
-                    </div>
+                    {pt.text === "Choose your starter pokemon companion" && (
+                      <div className="pointer-events-none absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-50 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:-translate-y-2">
+                        <div className="relative w-40 h-28">
+                          <img src="/shop-items/bulba.png" alt="" className="absolute left-0 bottom-0 w-20 h-20 object-contain rounded-xl shadow-xl border border-[#fff8f4]/50 dark:border-[#120d08]/50" style={{ transform: "rotate(-6deg)", zIndex: 0 }} />
+                          <img src="/shop-items/pikachu_display.png" alt="" className="absolute left-1/2 -translate-x-1/2 top-0 z-10 w-24 h-24 object-contain rounded-xl shadow-2xl border-2 border-[#fff8f4]/50 dark:border-[#120d08]/50"/>
+                          <img src="/shop-items/squirtle.png" alt="" className="absolute right-0 bottom-0 w-20 h-20 object-contain rounded-xl shadow-xl border border-[#fff8f4]/50 dark:border-[#120d08]/50" style={{ transform: "rotate(6deg)", zIndex: 1 }} />
+                        </div>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -721,12 +727,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                   { text: "Rare early user badge + lifetime support benefits", img: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=150&q=80", angle: 75 },
                   { text: "50 gems", img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=150&q=80", angle: 100 }
                 ].map((pt, i) => (
-                  <li key={i} className="group relative flex items-center gap-2 cursor-default">
+                  <li key={i} className="flex items-center gap-2 cursor-default">
                     <CheckCircle2 className="h-4 w-4 text-[#f3e0bc] dark:text-[#dcb174]" /> 
                     <span>{pt.text}</span>
-                    <div className="pointer-events-none absolute bottom-full mb-1 left-[10%] z-50 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:-translate-y-2 group-hover:scale-110">
-                      <img src={pt.img} alt="" className="w-24 h-24 object-cover rounded-xl shadow-2xl border-2 border-white/20" style={{ transform: `rotate(${pt.angle}deg)` }} />
-                    </div>
                   </li>
                 ))}
               </ul>
@@ -889,7 +892,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
 
       {navigatorVisible && !navigatorMerged && (
         <div className="pointer-events-none fixed bottom-6 sm:bottom-8 z-[100] w-full">
-          <div className="mx-auto w-full max-w-5xl px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-5xl px-8 lg:px-8">
             <div className="relative">
               {/* Tooltip + mascot on the right */}
               <div className="absolute right-0 bottom-0.5 flex justify-center">
