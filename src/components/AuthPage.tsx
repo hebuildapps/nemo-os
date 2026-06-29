@@ -82,7 +82,7 @@ const AuthPage: React.FC = () => {
             value={password}
             onChange={e => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full p-[9px_11px] pr-[36px] border-[1.5px] border-border bg-surface2 font-mono text-[12px] text-foreground outline-none focus:border-primary"
+            className="w-full p-[9px_11px] pr-[36px] border-[1.5px] border-border bg-surface2 font-mono text-[12px] tracking-[0.25em] text-foreground outline-none focus:border-primary"
           />
           <button
             type="button"

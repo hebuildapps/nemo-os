@@ -304,10 +304,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
           <div className="md:hidden flex items-center gap-2">
             <button
               onClick={onTryNemo}
-              className="inline-flex items-center gap-1.5 rounded-md bg-[#5c601d] px-2.5 py-1.5 text-[13px] font-medium text-white hover:bg-[#757934] transition-colors sm:px-3"
+              className="inline-flex items-center gap-1.5 rounded-[4px] bg-[#5c601d] px-2 py-1 text-[13px] font-medium text-white hover:bg-[#757934] transition-colors sm:px-3"
             >
               <LogIn className="h-4 w-4" />
-              <span>Login</span>
             </button>
             <button
               className="p-2 text-[#291800] dark:text-[#dcb174]"
@@ -410,7 +409,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
         <section id="features" className="border-y border-[#291800]/10 dark:border-[#f3e0bc]/10 bg-[#fff1e4]/50 dark:bg-[#20150b]/50 py-10">
           <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-4 justify-center px-6 lg:px-8">
             <div className="text-center w-full">
-              <span className="block lg:text-[14px] text-[12px] font-bold uppercase tracking-[0.1em] text-[#47483a] dark:text-[#b4b5a3] mb-4">Used by focused learners preparing for</span>
+              <span className="block lg:text-[14px] text-[9px] font-bold uppercase tracking-[0.1em] text-[#47483a] dark:text-[#b4b5a3] mb-4">Used by focused learners preparing for</span>
               <div className="flex flex-wrap justify-center items-center gap-6 lg:gap-8">
                 {['UPSC', 'CAT', 'GATE', 'GMAT', 'JEE'].map((item) => (
                   <span key={item} className="lg:text-[28px] text-[14px] font-bold text-[#725731] dark:text-[#dcb174]">{item}</span>
@@ -504,7 +503,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
 
         <section id="work-smarter" className="mx-auto w-full max-w-7xl px-6 pb-8 lg:px-8">
           <div className="rounded-3xl border border-[#c9c7b6] dark:border-[#525148] bg-[#f8f5f1] dark:bg-[#1a1713] m-4 lg:m-10 p-6 md:p-10">
-            <h2 className="text-center text-[30px] lg:text-[36px] font-extrabold leading-tight text-[#46300D] dark:text-[#e0c8a3] md:text-[46px]">Work smarter not harder</h2>
+            <h2 className="text-center text-[24px] lg:text-[36px] font-extrabold leading-tight text-[#46300D] dark:text-[#e0c8a3] md:text-[46px]">Work smarter not harder</h2>
             <div className="mt-8 grid gap-8 lg:grid-cols-[1.05fr_1fr] lg:items-center">
               <div>
                 {smartPrepFeatures.map((feature, index) => {
@@ -521,13 +520,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                           setOpenFeatureIndex((prev) => (prev === index ? null : index));
                         }}
                       >
-                        <span className="text-[20px] lg:text-[24px] md:text-[28px] font-semibold leading-tight text-[#46300D] dark:text-[#e0c8a3]">{index + 1}. {feature.title}</span>
+                        <span className="text-[18px] lg:text-[24px] md:text-[28px] font-semibold leading-tight text-[#46300D] dark:text-[#e0c8a3]">{index + 1}. {feature.title}</span>
                         <ChevronDown className={`h-6 w-6 shrink-0 text-[#46300D] dark:text-[#e0c8a3] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                       </button>
 
                       <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-40 opacity-100 mt-3' : 'max-h-0 opacity-0'}`}>
-                        <p className="text-[15px] font-bold leading-relaxed text-[#46300D] dark:text-[#e0c8a3]">{feature.outcome}</p>
-                        <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-[#4b3a20] dark:text-[#c4b399]">{feature.description}</p>
+                        <p className="text-[14px] font-bold leading-relaxed text-[#46300D] dark:text-[#e0c8a3]">{feature.outcome}</p>
+                        <p className="mt-1 max-w-2xl text-[12px] leading-relaxed text-[#4b3a20] dark:text-[#c4b399]">{feature.description}</p>
                       </div>
                     </div>
                   );
@@ -580,6 +579,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                   'Daily roadmap from your exam target',
                   'Task completion with MCQ proof',
                   'Rewards that reinforce consistency',
+                  'Completely gamify your prep',
                 ].map((item, index) => (
                   <li key={item} className="flex gap-3 text-[14px] text-[#291800] dark:text-[#dcb174]">
                     <CheckCircle2 className="icon-pop mt-0.5 h-5 w-5 text-[#5c601d] dark:text-[#d3d977]" style={{ animationDelay: `${index * 110}ms` }} />
@@ -829,7 +829,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                         {navigatorLabel}
                       </div>
                     </div>
-                    <NemoMascot scrollYProgress={scrollYProgress} className="w-24 sm:w-10 h-auto relative z-10" />
+                    <NemoMascot scrollYProgress={scrollYProgress} className="w-8 sm:w-10 h-auto relative z-10" />
                   </div>
                 </div>
               </div>
@@ -902,7 +902,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
                       {navigatorLabel}
                     </div>
                   </div>
-                  <NemoMascot scrollYProgress={scrollYProgress} className="w-8 sm:w-10 h-auto relative z-10" />
+                  <NemoMascot scrollYProgress={scrollYProgress} className="w-10 sm:w-12 h-auto relative z-10" />
                 </div>
               </div>
               <div className="flex items-center w-full">

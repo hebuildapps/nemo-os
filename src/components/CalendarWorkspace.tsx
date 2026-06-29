@@ -84,8 +84,8 @@ const CalendarWorkspace: React.FC<CalendarWorkspaceProps> = ({ tasks, onComplete
         {DAYS.map(d => <div key={d} className="font-pixel text-[6px] text-foreground/55 py-[5px] text-center">{d}</div>)}
       </div>
 
-      <div className="flex-1 min-h-0 bg-[#2C2C2E] p-[10px]">
-        <div className="h-full grid grid-cols-7 grid-rows-6 gap-[6px]">
+      <div className="flex-1 min-h-0 bg-[#2C2C2E] p-[10px] overflow-y-auto">
+        <div className="grid grid-cols-7 auto-rows-[minmax(48px,1fr)] gap-[6px]">
           {Array.from({ length: totalSlots }).map((_, slot) => {
             const d = slot - firstDay + 1;
             if (d < 1 || d > daysInMonth) {

@@ -217,7 +217,7 @@ const Index: React.FC = () => {
         </div>
 
         {/* Center: Workspace */}
-        <main className={`flex-1 h-full min-w-0 bg-[#cec8b8] overflow-y-auto px-[24px] py-[18px] max-md:pb-[72px] ${hideWorkspaceScrollbar ? 'hide-scrollbar' : ''}`}>
+        <main className={`flex-1 h-full min-w-0 bg-[#cec8b8] overflow-y-auto px-[24px] py-[18px] max-md:pb-[92px] ${hideWorkspaceScrollbar ? 'hide-scrollbar' : ''}`}>
           <div className={workspace === 'calendar' ? 'h-full' : 'hidden h-full'}>
             <CalendarWorkspace tasks={nemo.tasks} onComplete={handleComplete} />
           </div>
