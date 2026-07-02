@@ -665,22 +665,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
           </div>
         </section>
 
-        <section id="pricing" className="mx-auto w-full max-w-7xl px-6 py-16 lg:py-20 lg:px-8">
-          <div className="mb-10 lg:mb-12 text-center">
-            <h2 className="text-[32px] md:text-[42px] font-bold lg:text-[54px] font-cooper">Start free, upgrade when ready</h2>
+<section
+  id="pricing"
+  className="mx-auto w-full max-w-6xl px-6 py-12 lg:py-14 lg:px-8"
+>          <div className="mb-8 lg:mb-10 text-center">
+  <h2 className="text-[28px] md:text-[36px] lg:text-[46px] font-bold font-cooper">Start free, upgrade when ready</h2>
             <p className="mx-auto mt-3 max-w-2xl text-[15px] lg:text-[16px] text-[#47483a] dark:text-[#b4b5a3]">Two clear tiers: Monthly for flexibility, and an olive-highlighted Lifetime plan for strongest long-term value.</p>
             <p className="mx-auto mt-2 max-w-xl text-[13px] font-semibold text-[#5c601d] dark:text-[#d3d977]">Most serious learners choose lifetime within 7 days.</p>
           </div>
-          <div className="hidden md:grid mx-auto max-w-4xl gap-8 md:grid-cols-2">
-            <article className="rounded-2xl border border-[#c9c7b6] dark:border-[#525148] bg-[#fff1e4] dark:bg-[#20150b] p-8">
+          <div className="hidden md:grid mx-auto max-w-4xl gap-6 md:grid-cols-2">
+            <article className="rounded-2xl border border-[#c9c7b6] dark:border-[#525148] bg-[#fff1e4] dark:bg-[#20150b] p-6">
               <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#47483a] dark:text-[#b4b5a3]">Monthly</p>
               <div className="mt-4 flex items-end gap-1">
-                <span className="text-[56px] font-derif">$4</span>
+                <span className="text-[46px] font-derif">$4</span>
                 <span className="mb-2 text-[#47483a] dark:text-[#b4b5a3]">/ month</span>
               </div>
               <p className="mt-2 text-[14px] text-[#47483a] dark:text-[#b4b5a3]">Best for trying Nemo with low commitment.</p>
               <p className="mt-1 text-[12px] font-semibold text-[#6f5a34] dark:text-[#dcb174]">No lock-in. Upgrade anytime.</p>
-              <ul className="mt-5 space-y-3 text-[14px] text-[#393938] dark:text-[#cfcfcf]">
+              <ul className="mt-5 space-y-3 text-[13px] text-[#393938] dark:text-[#cfcfcf]">
                 {[
                   { text: "Full task + streak system", img: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=150&q=80", angle: 75 },
                   { text: "Progress and badge tracking", img: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=150&q=80", angle: 105 },
@@ -706,19 +708,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               </ul>
               <button
                 onClick={onTryNemo}
-                className="mt-7 w-full rounded-xl border-2 border-[#5c601d] dark:border-[#d3d977] py-3 font-bold text-[#5c601d] dark:text-[#d3d977] transition-colors hover:bg-[#5c601d] dark:hover:bg-[#d3d977] hover:text-white dark:hover:text-[#120d08]"
-              >
+                className="mt-5 w-full rounded-xl border-2 border-[#5c601d] dark:border-[#d3d977] py-3 font-bold text-[#5c601d] dark:text-[#d3d977] transition-colors hover:bg-[#5c601d] dark:hover:bg-[#d3d977] hover:text-white dark:hover:text-[#120d08]"
+              > 
                 Choose Monthly
               </button>
             </article>
-            <article className="relative scale-[1.05] overflow-hidden rounded-2xl border-2 border-[#5c601d] dark:border-[#d3d977] bg-[#5c601d] dark:bg-[#d3d977] p-8 text-white dark:text-[#120d08] shadow-2xl shadow-[#5c601d]/30">
+            <article className="relative scale-[1.02] overflow-hidden rounded-2xl border-2 border-[#5c601d] dark:border-[#d3d977] bg-[#5c601d] dark:bg-[#d3d977] p-8 text-white dark:text-[#120d08] shadow-2xl shadow-[#5c601d]/30">
               <div className="absolute right-4 top-2.5 rounded-md bg-[#beab03] px-3 py-1 text-[10px] font-bold tracking-[0.12em] text-[#ffffff]">MOST POPULAR</div>
               <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/70 dark:text-white/70">One-time</p>
               <div className="mt-4 flex items-end gap-1">
-                <span className="text-[56px] font-derif">$9</span>
+                <span className="text-[46px] font-derif">$9</span>
               </div>
               <p className="mt-2 text-[14px] text-white/85 dark:text-white/85">One payment. Keep your prep system for every future goal.</p>
-              <ul className="mt-5 space-y-3 text-[14px] text-white/95 dark:text-white/95">
+              <ul className="mt-5 space-y-3 text-[13px] text-white/95 dark:text-white/95">
                 {[
                   { text: "Everything in Monthly", img: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=150&q=80", angle: 80 },
                   { text: "Lifetime updates", img: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=150&q=80", angle: 110 },
@@ -735,7 +737,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onTryNemo }) => {
               </ul>
               <button
                 onClick={onTryNemo}
-                className="mt-7 w-full rounded-xl bg-[#fff8f4] dark:bg-[#120d08] py-3 font-bold text-[#5c601d] dark:text-[#d3d977] transition-colors hover:bg-[#f3e0bc] dark:hover:bg-[#4a3a1f]"
+                className="mt-5 w-full rounded-xl bg-[#fff8f4] dark:bg-[#120d08] py-3 font-bold text-[#5c601d] dark:text-[#d3d977] transition-colors hover:bg-[#f3e0bc] dark:hover:bg-[#4a3a1f]"
               >
                 Get Lifetime Access
               </button>
